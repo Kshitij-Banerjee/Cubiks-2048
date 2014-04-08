@@ -3,76 +3,120 @@
 <html>
 <title> Cube-2048 </title>
 <body>
+  <!-- <h1 style="font-size :80px ; text-align:center"> Cube-2048</h1>     -->
 <script src="./libs/jquery.min.js"> </script>
 <script src="./libs/three.js"> </script>
 <script src="./libs/Stats.js"> </script>
+<script src="./libs/keyboard.js"></script>
+<script src="./js/cube.js"></script>
 <script>
+
+    init();
+    bind_keyboard_keys();
+    animate();
 
 var renderer, scene, camera, cube_group;
 
 function init(){
 	var div = document.createElement('div');
 	document.body.appendChild( div );
-	
-	scene = new THREE.Scene();
-	
-	camera = new THREE.PerspectiveCamera( 45, window.innerWidth/ window.innerHeight, 1, 10000 );
-	
-	camera.position.x = 0;
-	camera.position.z = 200;
-	camera.position.y = 200;
-	
-	camera.lookAt( scene.position );	
 
+	scene = new THREE.Scene();
+
+	// Cameras
+
+	camera = new THREE.PerspectiveCamera( 45, window.innerWidth/ window.innerHeight, 1, 10000 );
+	camera.position.set( 0,100,200 );
+	camera.lookAt( scene.position );
 	scene.add( camera );
-		
-	scene.add( new THREE.AmbientLight( 0x666666 ) );	
+
+	// Lights
+
 	var spotLight = new THREE.SpotLight( 0xffffff );
-	spotLight.position.set( 1.0, 1.17,8.00 );
+	spotLight.position.set( 300,300,300 );
 	scene.add( spotLight );
-	
-	
-	var cube_dim = 95;	
-	cube_geo = new THREE.CubeGeometry( cube_dim,cube_dim,cube_dim );	
-	cube_mat = new THREE.MeshNormalMaterial( {color:  0x589768, opacity : 0.4, transparent : true } );
-	cube_inner = new THREE.Mesh( cube_geo,cube_mat );
-	
-	cube_dim = 100;	
-	var cube_geo = new THREE.CubeGeometry( cube_dim,cube_dim,cube_dim, 3, 3, 3 );	
-	var cube_mat = new THREE.MeshBasicMaterial( {color:  0x589768, opacity : 0.3, transparent : true, blending : THREE.MultiplyBlending} );
-	cube_outer = new THREE.Mesh( cube_geo,cube_mat );
-		
+	scene.add( new THREE.AmbientLight( 0x666666 ) );
+
+	// Geometries
 	cube_group = new THREE.Object3D();
+
+	
+    // Inner cubes
+
+	for (var i = -1 ; i < 2; i++)
+	    for (var j = -1; j < 2; j++)
+	        for (var k = -1; k < 2; k++)
+	        {
+	            var block = create_inner_cube( 33 );
+	            block.position.set( i* 33, j * 33, k* 33);
+	            cube_group.add(block);
+	        }
+
+
+    // Outer cubes
+	cube_inner = create_outer_cube(99);
+	cube_outer = create_outer_cube(101);
+
 	cube_group.add( cube_inner );
 	cube_group.add( cube_outer );
-	scene.add( cube_group );
-	
-	
+	scene.add(cube_group);
+
+	// Renderer
+
 	renderer = new THREE.WebGLRenderer( { antialias: true } );
-	renderer.setSize( window.innerWidth, window.innerHeight );
+	renderer.setSize( window.innerWidth -100 , window.innerHeight -100 );
 	renderer.setClearColor( 0x404040 );
 	renderer.sortObjects = false;
-	
-	div.appendChild( renderer.domElement )
 
-	//stats = new Stats();
-	//div.appendChild( stats.domElement );	
+	div.appendChild(renderer.domElement);
+
+    // Axis
+
+	var axisHelper = new THREE.AxisHelper(5);
+	scene.add(axisHelper);
 }
+
+var X_axis = new THREE.Vector3( 1, 0, 0);
+var Y_axis = new THREE.Vector3( 0, 1, 0);
+var Z_axis = new THREE.Vector3( 0, 0, 1);
 
 function animate()
 {
 	requestAnimationFrame( animate );
-	
-	cube_group.rotation.x += 0.01;
-	cube_group.rotation.y += 0.01;
+
+	if (rotation_animation.is_animating() )
+	{
+	    if (rotation_animation.rotate_x) {
+	        //cube_group.rotateX(rotation_animation.rotation_direction * rotation_animation.get_offset());
+	        rotateAroundWorldAxis(cube_group, X_axis, rotation_animation.rotation_direction * rotation_animation.get_offset());
+
+	        if (--rotation_animation.animation_residue == 0) {
+	            rotation_animation.rotate_x = false;
+	        }
+	    }
+	    else if (rotation_animation.rotate_y) {
+	        //cube_group.rotateY(rotation_animation.rotation_direction * rotation_animation.get_offset());
+	        rotateAroundWorldAxis(cube_group, Y_axis, rotation_animation.rotation_direction * rotation_animation.get_offset());
+
+	        if (--rotation_animation.animation_residue == 0) {
+	            rotation_animation.rotate_y = false;
+	        }
+	    }
+	    else if (rotation_animation.rotate_z) {
+	        //cube_group.rotateZ(rotation_animation.rotation_direction * rotation_animation.get_offset());
+	        rotateAroundWorldAxis(cube_group, Z_axis, rotation_animation.rotation_direction * rotation_animation.get_offset());
+
+	        if (--rotation_animation.animation_residue == 0) {
+	            rotation_animation.rotate_z = false;
+	        }
+	    }
+	}
 	
 	renderer.render( scene, camera );
 }
-init();
-animate();
 
  </script>
 
-Cube-2048
+
 </body>
 </html>
