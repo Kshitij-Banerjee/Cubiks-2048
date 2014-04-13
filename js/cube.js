@@ -1,11 +1,12 @@
 function create_outer_cube(cube_dim) {
-    cube_geo = new THREE.CubeGeometry(cube_dim, cube_dim, cube_dim);
-    cube_mat = new THREE.MeshBasicMaterial({ color: 0x589768, opacity: 0.1, transparent: true });
-    return new THREE.Mesh(cube_geo, cube_mat);
+    var cube_geo = new THREE.CubeGeometry(cube_dim, cube_dim, cube_dim);
+    var cube_mat = new THREE.MeshBasicMaterial({ color: 0x589768, opacity: 0.1, transparent: true });
+    var cube_mesh = new THREE.Mesh(cube_geo, cube_mat);
+    //cube_mesh.position.set(cube_dim/2, cube_dim/2, cube_dim/2);
 }
 
 function create_inner_cube(cube_dim) {
-    var offset = 10;
+    var offset = 10;    
 
     cube_dim -= offset;
     cube_geo = new THREE.CubeGeometry(cube_dim, cube_dim, cube_dim);
@@ -13,7 +14,27 @@ function create_inner_cube(cube_dim) {
     return new THREE.Mesh(cube_geo, cube_mat);
 }
 
-function rot_animation( angle_in ) {
+function create_random_cube()
+{
+    var x = Math.floor(Math.random()* 10) % 3;
+    var y = Math.floor(Math.random() * 10) % 3;
+    var z = Math.floor(Math.random() * 10) % 3;
+
+    x--;
+    y--;
+    z--;
+
+    x *= (100 / cube_size);
+    y *= (100 / cube_size);
+    z *= (100 / cube_size);
+
+    var cube = create_inner_cube(33);
+
+    cube.position.set(x, y, z);
+    cube_group.add( cube );
+}
+
+function rot_animation(angle_in) {
     this.animation_duration = 10; // 2 seconds apprx
     this.angle = angle_in;
     this.animation_residue = 0;
@@ -39,6 +60,7 @@ rot_animation.prototype.get_offset = function ()
 function bind_keyboard_keys() {
 
     function ondownarrow() { // Rotate about x clockwise.
+        create_random_cube();
         if (!rotation_animation.is_animating() )
         {
             rotation_animation.animation_residue = rotation_animation.animation_duration;
@@ -48,6 +70,7 @@ function bind_keyboard_keys() {
     }
 
     function onuparrow() { // Rotate about x anti-clockwise
+        create_random_cube();
         if (!rotation_animation.is_animating() )
         {
             rotation_animation.animation_residue = rotation_animation.animation_duration;
@@ -57,6 +80,7 @@ function bind_keyboard_keys() {
     }
 
     function onleftarrow() { // Rotate about z anticlockwise
+        create_random_cube();
         if (!rotation_animation.is_animating() ) {
             rotation_animation.animation_residue = rotation_animation.animation_duration;
             rotation_animation.rotation_direction = +1
@@ -65,6 +89,7 @@ function bind_keyboard_keys() {
     }
 
     function onrightarrow() {  // Rotate about z clockwise
+        create_random_cube();
         if (!rotation_animation.is_animating() ) {
             rotation_animation.animation_residue = rotation_animation.animation_duration;
             rotation_animation.rotation_direction = -1;
