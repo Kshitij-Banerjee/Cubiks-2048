@@ -14,23 +14,51 @@ function create_inner_cube(cube_dim) {
     return new THREE.Mesh(cube_geo, cube_mat);
 }
 
+function GAME( size ) {
+		this.game_array = {};
+		
+		for( var i = 0 ; i < size; i ++ )	
+		{
+			this.game_array[i] = {};
+			for( var j = 0 ; j < size; j++ )
+			{
+				this.game_array[i][j] = {};	
+					for( var k = 0; k < size; k ++ )
+					{
+						this.game_array[i][j][k] = 0;
+					}
+			}
+		}
+};	
+
+var CUBE2048 = new GAME( 3 );
+
+function create_random_indice()
+{
+	x = Math.floor(Math.random()* 10) % 3;    
+    return x ;	
+}
+
 function create_random_cube()
 {
-    var x = Math.floor(Math.random()* 10) % 3;
-    var y = Math.floor(Math.random() * 10) % 3;
-    var z = Math.floor(Math.random() * 10) % 3;
-
-    x--;
-    y--;
-    z--;
-
-    x *= (100 / cube_size);
-    y *= (100 / cube_size);
-    z *= (100 / cube_size);
-
+	var x, y, z;
+	do
+	{
+	 x = create_random_indice();
+	 y = create_random_indice();
+	 z = create_random_indice();
+	}
+	while( CUBE2048.game_array[x][y][z] != 0 );
+	
+	CUBE2048.game_array[x][y][z] = 1;
+	
     var cube = create_inner_cube(33);
 
-    cube.position.set(x, y, z);
+	x--;
+	y--;
+	z--;	
+	
+    cube.position.set( x * (100 / cube_size), y * (100 / cube_size), z * (100 / cube_size) );
     cube_group.add( cube );
 }
 
