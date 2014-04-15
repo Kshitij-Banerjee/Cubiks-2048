@@ -15,52 +15,68 @@ function create_inner_cube(cube_dim) {
 }
 
 function GAME( size ) {
+		this.game_size = size;
+		this.cube_count = size * size* size;
+		this.filled_cubes = 0;
 		this.game_array = {};
-		
-		for( var i = 0 ; i < size; i ++ )	
-		{
-			this.game_array[i] = {};
-			for( var j = 0 ; j < size; j++ )
-			{
-				this.game_array[i][j] = {};	
-					for( var k = 0; k < size; k ++ )
-					{
-						this.game_array[i][j][k] = 0;
-					}
-			}
+		this.coord = {x:0,y:0,z:0};
+        // Initialize the array .
+
+		for( var i = 0 ; i < this.cube_count; i ++ )	
+		{			
+			this.game_array[i] = 0;
 		}
 };	
 
 var CUBE2048 = new GAME( 3 );
 
-function create_random_indice()
-{
-	x = Math.floor(Math.random()* 10) % 3;    
-    return x ;	
-}
+GAME.prototype.create_random_number = function (limit) {
+    return Math.floor(Math.random() * 100) % limit;
+};
 
-function create_random_cube()
-{
-	var x, y, z;
-	do
-	{
-	 x = create_random_indice();
-	 y = create_random_indice();
-	 z = create_random_indice();
-	}
-	while( CUBE2048.game_array[x][y][z] != 0 );
-	
-	CUBE2048.game_array[x][y][z] = 1;
-	
+GAME.prototype.fill_coord= function (rand) {
+    this.coord.z = Math.floor( rand / (this.game_size*this.game_size) ); //  z level
+    rand = rand % (this.game_size * this.game_size); // remaining in level
+    //rand --; // 0 indexing.
+    this.coord.y = Math.floor(rand / this.game_size);
+    this.coord.x = rand % this.game_size;
+
+    this.coord.x = Math.floor(this.coord.x - Math.floor(this.game_size / 2));
+    this.coord.y = Math.floor(this.coord.y - Math.floor(this.game_size / 2));
+    this.coord.z = Math.floor(this.coord.z - Math.floor(this.game_size / 2));
+
+    this.coord.x *= (100 / this.game_size);
+    this.coord.y *= (100 / this.game_size);
+    this.coord.z *= (100 / this.game_size);
+};
+
+GAME.prototype.add_random_cube = function () {
+
+    // No more to add..
+    if (this.filled_cubes == this.cube_count) {
+        alert("Game Over!");
+        return;
+    }
+
+    var rand = this.create_random_number( this.cube_count);
+
+    while (this.game_array[rand] != 0) {
+        rand++;
+        if (rand == this.cube_count)
+            rand = 0;
+    }
+    
+   this.game_array[rand] = 1;
+
+    this.fill_coord( rand );
+
     var cube = create_inner_cube(33);
+    cube.position.set(this.coord.x, this.coord.y, this.coord.z);
 
-	x--;
-	y--;
-	z--;	
-	
-    cube.position.set( x * (100 / cube_size), y * (100 / cube_size), z * (100 / cube_size) );
-    cube_group.add( cube );
-}
+    cube_group.add(cube);
+
+    this.filled_cubes++;
+};
 
 function rot_animation(angle_in) {
     this.animation_duration = 10; // 2 seconds apprx
@@ -88,7 +104,7 @@ rot_animation.prototype.get_offset = function ()
 function bind_keyboard_keys() {
 
     function ondownarrow() { // Rotate about x clockwise.
-        create_random_cube();
+        CUBE2048.add_random_cube();
         if (!rotation_animation.is_animating() )
         {
             rotation_animation.animation_residue = rotation_animation.animation_duration;
@@ -98,7 +114,7 @@ function bind_keyboard_keys() {
     }
 
     function onuparrow() { // Rotate about x anti-clockwise
-        create_random_cube();
+        CUBE2048.add_random_cube();
         if (!rotation_animation.is_animating() )
         {
             rotation_animation.animation_residue = rotation_animation.animation_duration;
@@ -108,7 +124,7 @@ function bind_keyboard_keys() {
     }
 
     function onleftarrow() { // Rotate about z anticlockwise
-        create_random_cube();
+        CUBE2048.add_random_cube();
         if (!rotation_animation.is_animating() ) {
             rotation_animation.animation_residue = rotation_animation.animation_duration;
             rotation_animation.rotation_direction = +1
@@ -117,7 +133,7 @@ function bind_keyboard_keys() {
     }
 
     function onrightarrow() {  // Rotate about z clockwise
-        create_random_cube();
+        CUBE2048.add_random_cube();
         if (!rotation_animation.is_animating() ) {
             rotation_animation.animation_residue = rotation_animation.animation_duration;
             rotation_animation.rotation_direction = -1;
