@@ -20,25 +20,24 @@
     var Y_axis = new THREE.Vector3(0, 1, 0);
     var Z_axis = new THREE.Vector3(0, 0, 1);
     var texture_2 = null; 
+
     var texture_4 = null;
 
     var clock = new THREE.Clock();
-
 
     init();
     
     animate();
     
     function init() {
+	THREE.ImageUtils.crossOrigin = "anonymous";
+    texture_2 = THREE.ImageUtils.loadTexture('./Texture_2.gif');
+    texture_4 = THREE.ImageUtils.loadTexture('./Texture_4.gif');
 
-        texture_2 = THREE.ImageUtils.loadTexture('Textures/Texture_2.gif');
-        texture_4 = THREE.ImageUtils.loadTexture('Textures/Texture_4.gif');
-
-        div = document.createElement('div');
-        document.body.appendChild(div);
-
-        scene = new THREE.Scene();
-
+    div = document.createElement('div');
+    document.body.appendChild(div);
+    
+	scene = new THREE.Scene();
         // The plane platform.
 
         var plane = new THREE.PlaneGeometry(1000, 1000, 100, 100);
@@ -49,6 +48,7 @@
         plane_mesh.rotation.x -= 1.5;
 
         // Cameras
+
 
         camera = new THREE.PerspectiveCamera(45, window.innerWidth / window.innerHeight, 1, 10000);
         camera.position.set(50, 50 + (40 * cube_size), 50 * cube_size);

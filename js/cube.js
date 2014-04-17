@@ -44,6 +44,7 @@ GAME.prototype.create_random_number = function (limit) {
 GAME.prototype.fill_coord= function (rand, coord) {
     coord.z = Math.floor( rand / (this.game_size*this.game_size) ); //  z level
     rand = rand % (this.game_size * this.game_size); // remaining in level
+
     coord.y = Math.floor(rand / this.game_size);
     coord.x = rand % this.game_size;
 
@@ -197,7 +198,9 @@ function bind_keyboard_keys() {
     });
 
 
+
     KeyboardJS.on('up', function () { // Rotate about x anti-clockwise
+
 
         if (!rotation_animation.is_animating()) {
             CUBE2048.add_random_cube();
@@ -210,6 +213,7 @@ function bind_keyboard_keys() {
     });
 
     KeyboardJS.on('left', function () { // Rotate about z anticlockwise
+
 
         if (!rotation_animation.is_animating()) {
             CUBE2048.add_random_cube();
