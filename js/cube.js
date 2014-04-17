@@ -10,7 +10,15 @@ function create_inner_cube(cube_dim) {
 
     cube_dim -= offset;
     cube_geo = new THREE.CubeGeometry(cube_dim, cube_dim, cube_dim);
-    cube_mat = new THREE.MeshBasicMaterial({ color: 0xffffff, opacity: 0.3, transparent: true });
+
+    var texture = null;
+
+    if (Math.random() < 0.9 )
+        texture = texture_2;
+    else
+        texture = texture_4;
+
+    cube_mat = new THREE.MeshBasicMaterial({ map: texture, transparent : true, opacity :0.8 });
     return new THREE.Mesh(cube_geo, cube_mat);
 }
 
@@ -18,62 +26,61 @@ function GAME( size ) {
 		this.game_size = size;
 		this.cube_count = size * size* size;
 		this.filled_cubes = 0;
-		this.game_array = {};
+		this.cube_array = {};
 		this.coord = {x:0,y:0,z:0};
         // Initialize the array .
 
 		for( var i = 0 ; i < this.cube_count; i ++ )	
 		{			
-			this.game_array[i] = 0;
+		    this.cube_array[i] = 0;
 		}
 };	
 
-var CUBE2048 = new GAME( 3 );
 
 GAME.prototype.create_random_number = function (limit) {
     return Math.floor(Math.random() * 100) % limit;
 };
 
-GAME.prototype.fill_coord= function (rand) {
-    this.coord.z = Math.floor( rand / (this.game_size*this.game_size) ); //  z level
+GAME.prototype.fill_coord= function (rand, coord) {
+    coord.z = Math.floor( rand / (this.game_size*this.game_size) ); //  z level
     rand = rand % (this.game_size * this.game_size); // remaining in level
-    //rand --; // 0 indexing.
-    this.coord.y = Math.floor(rand / this.game_size);
-    this.coord.x = rand % this.game_size;
+    coord.y = Math.floor(rand / this.game_size);
+    coord.x = rand % this.game_size;
 
-    this.coord.x = Math.floor(this.coord.x - Math.floor(this.game_size / 2));
-    this.coord.y = Math.floor(this.coord.y - Math.floor(this.game_size / 2));
-    this.coord.z = Math.floor(this.coord.z - Math.floor(this.game_size / 2));
+    coord.x = Math.floor(coord.x - Math.floor(this.game_size / 2));
+    coord.y = Math.floor(coord.y - Math.floor(this.game_size / 2));
+    coord.z = Math.floor(coord.z - Math.floor(this.game_size / 2));
 
-    this.coord.x *= (100 / this.game_size);
-    this.coord.y *= (100 / this.game_size);
-    this.coord.z *= (100 / this.game_size);
+    coord.x *= (100 / this.game_size);
+    coord.y *= (100 / this.game_size);
+    coord.z *= (100 / this.game_size);
 };
+
+
 
 GAME.prototype.add_random_cube = function () {
 
     // No more to add..
     if (this.filled_cubes == this.cube_count) {
-        alert("Game Over!");
+        release();    
         return;
     }
 
     var rand = this.create_random_number( this.cube_count);
 
-    while (this.game_array[rand] != 0) {
+    while (this.cube_array[rand] != 0) {
         rand++;
         if (rand == this.cube_count)
             rand = 0;
     }
     
-   this.game_array[rand] = 1;
-
-    this.fill_coord( rand );
+    this.fill_coord( rand, this.coord );
 
     var cube = create_inner_cube(33);
     cube.position.set(this.coord.x, this.coord.y, this.coord.z);
 
     cube_group.add(cube);
+    this.cube_array[rand] = cube;
 
     this.filled_cubes++;
 };
@@ -96,55 +103,136 @@ rot_animation.prototype.is_animating = function () {
 rot_animation.prototype.get_offset = function ()
 { 
     return this.angle / this.animation_duration; 
-    //return 0.18;
 };
 
-    var rotation_animation = new rot_animation( Math.PI / 2);
+function createcoord() {
+    this.x = 0;
+    this.y = 0;
+    this.z = 0;
+};
+
+GAME.prototype.shift_cubes = function () {
+
+    for (var i = 0 ; i < this.cube_count; i++) {
+
+        if ( i > 8 && ( this.cube_array[i] != 0)) {
+            var j = i -9;
+            while ((j >= 0) && (this.cube_array[j] == 0))
+                j -= 9;
+
+            // Either j is empty, out of bound, or did not move at all
+            if (j >= 0 && this.cube_array[j] && 
+                (this.cube_array[i].material.map.sourceFile ==
+                 this.cube_array[j].material.map.sourceFile ))
+            {
+                cube_group.remove(this.cube_array[j]);
+                this.cube_array[j] = 0;
+                this.filled_cubes--;
+                j -= 9; 
+            }
+            
+
+            j += 9;
+            if (j == i)
+                continue;
+
+            if (j < 0)
+                continue;
+
+            var start_coord = new createcoord();
+            var last_coord = new createcoord();
+
+            this.fill_coord(i, start_coord);
+            this.fill_coord(j, last_coord);
+
+            this.cube_array[i].animation = {
+                "name": ("Cube_down" + i),
+                "length": 0.5,
+                "hierarchy": [
+                    {
+                        "parent": -1,
+                        "keys": [
+                            {
+                                "time": 0,
+                                "pos": [start_coord.x, start_coord.y, start_coord.z],
+                                "rot": [0, 0, 0],
+                                "scl": [1,1,1]
+                            },
+                            {
+                                "time": 0.5,
+                                "pos": [last_coord.x, last_coord.y, last_coord.z]
+                            }
+                        ]
+                    }
+                ]
+            };
+
+            THREE.AnimationHandler.add(this.cube_array[i].animation);
+
+            var cube_anim = new THREE.Animation(this.cube_array[i], this.cube_array[i].animation.name);
+            cube_anim.loop = false;
+            cube_anim.interpolationType = THREE.AnimationHandler.CATMULLROM;
+            cube_anim.play( false, 0 );
+
+            this.cube_array[j] = this.cube_array[i];
+            this.cube_array[i] = 0;
+        }
+    }
+};
+
+var rotation_animation = new rot_animation( Math.PI / 2);
 
 function bind_keyboard_keys() {
 
-    function ondownarrow() { // Rotate about x clockwise.
-        CUBE2048.add_random_cube();
-        if (!rotation_animation.is_animating() )
-        {
+    KeyboardJS.on('down', function () { // Rotate about x clockwise.
+
+        if (!rotation_animation.is_animating()) {
+            CUBE2048.add_random_cube();
             rotation_animation.animation_residue = rotation_animation.animation_duration;
             rotation_animation.rotation_direction = +1;
             rotation_animation.rotate_x = true;
-        }
-    }
 
-    function onuparrow() { // Rotate about x anti-clockwise
-        CUBE2048.add_random_cube();
-        if (!rotation_animation.is_animating() )
-        {
+            CUBE2048.shift_cubes();
+        }
+    });
+
+
+    KeyboardJS.on('up', function () { // Rotate about x anti-clockwise
+
+        if (!rotation_animation.is_animating()) {
+            CUBE2048.add_random_cube();
             rotation_animation.animation_residue = rotation_animation.animation_duration;
             rotation_animation.rotation_direction = -1;
             rotation_animation.rotate_x = true;
-        }
-    }
 
-    function onleftarrow() { // Rotate about z anticlockwise
-        CUBE2048.add_random_cube();
-        if (!rotation_animation.is_animating() ) {
+            CUBE2048.shift_cubes();
+        }
+    });
+
+    KeyboardJS.on('left', function () { // Rotate about z anticlockwise
+
+        if (!rotation_animation.is_animating()) {
+            CUBE2048.add_random_cube();
             rotation_animation.animation_residue = rotation_animation.animation_duration;
             rotation_animation.rotation_direction = +1
             rotation_animation.rotate_z = true;
-        }
-    }
 
-    function onrightarrow() {  // Rotate about z clockwise
-        CUBE2048.add_random_cube();
-        if (!rotation_animation.is_animating() ) {
+            CUBE2048.shift_cubes();
+        }
+    });
+
+    KeyboardJS.on('right',
+    function () {  // Rotate about z clockwise
+
+        if (!rotation_animation.is_animating()) {
+            CUBE2048.add_random_cube();
             rotation_animation.animation_residue = rotation_animation.animation_duration;
             rotation_animation.rotation_direction = -1;
             rotation_animation.rotate_z = true;
-        }
-    }
 
-    KeyboardJS.on('down arrow', ondownarrow);
-    KeyboardJS.on('up arrow', onuparrow );
-    KeyboardJS.on('left arrow', onleftarrow);
-    KeyboardJS.on('right arrow', onrightarrow);
+            CUBE2048.shift_cubes();
+        }
+    });
 }
 
 var rotWorldMatrix;
