@@ -1,8 +1,8 @@
 function create_outer_cube(cube_dim) {
     var cube_geo = new THREE.CubeGeometry(cube_dim, cube_dim, cube_dim);
     var cube_mat = new THREE.MeshBasicMaterial({ color: 0x589768, opacity: 0.1, transparent: true });
-    var cube_mesh = new THREE.Mesh(cube_geo, cube_mat);
-    //cube_mesh.position.set(cube_dim/2, cube_dim/2, cube_dim/2);
+    return new THREE.Mesh(cube_geo, cube_mat);
+    
 }
 
 function create_inner_cube(cube_dim) {
@@ -14,9 +14,9 @@ function create_inner_cube(cube_dim) {
     var texture = null;
 
     if (Math.random() < 0.9 )
-        texture = texture_2;
+        texture = textures[2];
     else
-        texture = texture_4;
+        texture = textures[4];
 
     cube_mat = new THREE.MeshBasicMaterial({ map: texture, transparent : true, opacity :0.8 });
     return new THREE.Mesh(cube_geo, cube_mat);
@@ -112,6 +112,14 @@ function createcoord() {
     this.z = 0;
 };
 
+function next_map(map) {
+    var underscore_idx = map.sourceFile.indexOf("_");
+    var dot_idx = map.sourceFile.lastIndexOf(".");
+    var index = map.sourceFile.substring(++underscore_idx,dot_idx);
+    index = parseInt(index);
+    return index + index;
+};
+
 GAME.prototype.shift_cubes = function () {
 
     for (var i = 0 ; i < this.cube_count; i++) {
@@ -123,12 +131,15 @@ GAME.prototype.shift_cubes = function () {
 
             // Either j is empty, out of bound, or did not move at all
             if (j >= 0 && this.cube_array[j] && 
-                (this.cube_array[i].material.map.sourceFile ==
-                 this.cube_array[j].material.map.sourceFile ))
+                (this.cube_array[i].material.map ==
+                 this.cube_array[j].material.map ))
             {
                 cube_group.remove(this.cube_array[j]);
                 this.cube_array[j] = 0;
                 this.filled_cubes--;
+
+                var next_texture = textures[next_map(this.cube_array[i].material.map)];
+                this.cube_array[i].material.map = next_texture;
                 j -= 9; 
             }
             
@@ -197,10 +208,7 @@ function bind_keyboard_keys() {
         }
     });
 
-
-
     KeyboardJS.on('up', function () { // Rotate about x anti-clockwise
-
 
         if (!rotation_animation.is_animating()) {
             CUBE2048.add_random_cube();
@@ -213,7 +221,6 @@ function bind_keyboard_keys() {
     });
 
     KeyboardJS.on('left', function () { // Rotate about z anticlockwise
-
 
         if (!rotation_animation.is_animating()) {
             CUBE2048.add_random_cube();

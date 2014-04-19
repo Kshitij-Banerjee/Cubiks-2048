@@ -19,9 +19,14 @@
     var X_axis = new THREE.Vector3(1, 0, 0);
     var Y_axis = new THREE.Vector3(0, 1, 0);
     var Z_axis = new THREE.Vector3(0, 0, 1);
-    var texture_2 = null; 
 
-    var texture_4 = null;
+    var textures = {
+        2: THREE.ImageUtils.loadTexture('./Textures/Texture_2.gif'),
+        4: THREE.ImageUtils.loadTexture('./Textures/Texture_4.gif'),
+        8: THREE.ImageUtils.loadTexture('./Textures/Texture_8.gif'),
+        16: THREE.ImageUtils.loadTexture('./Textures/Texture_16.gif'),
+        32: THREE.ImageUtils.loadTexture('./Textures/Texture_32.gif')
+    }
 
     var clock = new THREE.Clock();
 
@@ -30,14 +35,11 @@
     animate();
     
     function init() {
-	THREE.ImageUtils.crossOrigin = "anonymous";
-    texture_2 = THREE.ImageUtils.loadTexture('./Texture_2.gif');
-    texture_4 = THREE.ImageUtils.loadTexture('./Texture_4.gif');
 
-    div = document.createElement('div');
-    document.body.appendChild(div);
+        div = document.createElement('div');
+        document.body.appendChild(div);
     
-	scene = new THREE.Scene();
+	    scene = new THREE.Scene();
         // The plane platform.
 
         var plane = new THREE.PlaneGeometry(1000, 1000, 100, 100);
@@ -65,19 +67,11 @@
 
         // Geometries
         cube_group = new THREE.Object3D();
+        cube_group.position.set(50, 50, 0);
 
         // Refresh the game.
 
-        CUBE2048 = new GAME(3);
-
-        // Outer cubes
-        cube_inner = create_outer_cube(99);
-        cube_outer = create_outer_cube(101);
-
-        cube_group.add(cube_inner);
-        cube_group.add(cube_outer);
-
-        cube_group.position.set(50, 50, 0);
+        CUBE2048 = new GAME(3);        
 
         scene.add(cube_group);
 
@@ -125,6 +119,7 @@
             }
         }
 
+        // For the inner blocks..
         THREE.AnimationHandler.update(clock.getDelta());
 
         renderer.render(scene, camera);
