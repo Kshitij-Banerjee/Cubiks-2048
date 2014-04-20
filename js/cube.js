@@ -60,7 +60,7 @@ function bind_keyboard_keys() {
             rotation_animation.rotation_direction = +1
             rotation_animation.rotate_z = true;
 
-            CUBE2048.gravity.rotate(Math.PI / 2, Z_axis);
+            CUBE2048.gravity.rotate(-Math.PI / 2, Z_axis);
             CUBE2048.shift_cubes();
         }
     });
@@ -73,7 +73,7 @@ function bind_keyboard_keys() {
             rotation_animation.rotation_direction = -1;
             rotation_animation.rotate_z = true;
 
-            CUBE2048.gravity.rotate( -Math.PI/2, Z_axis);
+            CUBE2048.gravity.rotate( Math.PI/2, Z_axis);
             CUBE2048.shift_cubes();
         }
 
