@@ -9,9 +9,12 @@
   <!-- <h1 style="font-size :80px ; text-align:center"> Cube-2048</h1>     -->
 <script src="./libs/jquery.min.js"> </script>
 <script src="./libs/three.js"> </script>
-<script src="./libs/Stats.js"> </script>
 <script src="./libs/keyboard.js"></script>
 <script src="./js/cube.js"></script>
+<script src="./js/gravity.js"></script>
+<script src="./js/Game.js"></script>
+<script src="./js/rotation_anim.js"></script>
+
 <script>
     var renderer, scene, camera, cube_group;
     var cube_size = 3;
@@ -51,7 +54,6 @@
 
         // Cameras
 
-
         camera = new THREE.PerspectiveCamera(45, window.innerWidth / window.innerHeight, 1, 10000);
         camera.position.set(50, 50 + (40 * cube_size), 50 * cube_size);
         camera.lookAt(new THREE.Vector3(50, 50, 0));
@@ -81,7 +83,7 @@
         renderer.setSize(window.innerWidth - 20, window.innerHeight - 20);
         renderer.setClearColor(0xffffff);
 
-        div.appendChild(renderer.domElement);
+        div.appendChild(renderer.domElement);        
 
         // Axis
 
