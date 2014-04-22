@@ -19,22 +19,26 @@ function GAME(size) {
     this.gravity = new threeD_vector();
     this.coord = new createcoord();
 
-    div = document.createElement('div');
-    div.id = "i";
-    document.body.appendChild(div);
-    div = document.createElement('div');
-    div.id = "j";
-    document.body.appendChild(div);
-    div = document.createElement('div');
-    div.id = "k";
-    document.body.appendChild(div);
-    div = document.createElement('div');
-    div.id = "x";
-    document.body.appendChild(div);
+	// To print the current gravity direction....
+    // div = document.createElement('div');
+    // div.id = "i";
+    // document.body.appendChild(div);
+    // div = document.createElement('div');
+    // div.id = "j";
+    // document.body.appendChild(div);
+    // div = document.createElement('div');
+    // div.id = "k";
+    // document.body.appendChild(div);
+    // div = document.createElement('div');
+    // div.id = "x";
+    // document.body.appendChild(div);
 
-    $("#i").text(this.gravity.direction.x);
-    $("#j").text(this.gravity.direction.y);
-    $("#k").text(this.gravity.direction.z);
+    // $("#i").text(this.gravity.direction.x);
+    // $("#j").text(this.gravity.direction.y);
+    // $("#k").text(this.gravity.direction.z);
+	
+	this.add_random_cube();
+	this.shift_cubes();
 
 };
 
@@ -116,6 +120,7 @@ GAME.prototype.is_in_bound = function( i2, j2 , k2 ){
     return true;
 };
 
+var counter = 0;
 GAME.prototype.sift_cube = function ( i, j, k, direction ) {
 
     var start_index = this.coord_to_index(i, j, k)
@@ -149,6 +154,9 @@ GAME.prototype.sift_cube = function ( i, j, k, direction ) {
 
         if (this.cube_array[start_index].material.map == this.cube_array[last_index].material.map ) 
         {
+			
+			console.log( start_index + " Merged with " + last_index );
+				
             cube_group.remove(this.cube_array[last_index]);
             this.cube_array[last_index] = 0;
             this.filled_cubes--;
@@ -183,7 +191,7 @@ GAME.prototype.sift_cube = function ( i, j, k, direction ) {
     this.fill_coord(last_index, last_coord);
 
     this.cube_array[start_index].animation = {
-                "name": ("Cube_down" + start_index),
+                "name": ("Cube_down" + (++counter)),
                 "length": 0.5,
                 "hierarchy": [
                     {

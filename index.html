@@ -1,8 +1,8 @@
-<meta content="text/html;charset=utf-8" http-equiv="Content-Type">
+<meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
 
 <html>
 <head>
-    <title> Cube-2048 </title>
+<title> Cube-2048 </title>
 </head>
 
 <body>
@@ -70,6 +70,10 @@
         // Geometries
         cube_group = new THREE.Object3D();
         cube_group.position.set(50, 50, 0);
+		
+		//==================================================
+		// Insert debug code from debug.js here...	
+		//==================================================
 
         // Refresh the game.
 
@@ -89,6 +93,7 @@
 
         var axisHelper = new THREE.AxisHelper(5);
         scene.add(axisHelper);
+		
 
         bind_keyboard_keys();
     };
@@ -103,6 +108,9 @@
 
                 if (--rotation_animation.animation_residue == 0) {
                     rotation_animation.rotate_x = false;
+					
+					CUBE2048.gravity.rotate( (- rotation_animation.rotation_direction)*Math.PI/2, X_axis );
+					CUBE2048.shift_cubes();
                 }
             }
             else if (rotation_animation.rotate_y) {
@@ -110,6 +118,9 @@
 
                 if (--rotation_animation.animation_residue == 0) {
                     rotation_animation.rotate_y = false;
+					
+					CUBE2048.gravity.rotate( (- rotation_animation.rotation_direction)*Math.PI/2, Y_axis );
+					CUBE2048.shift_cubes();
                 }
             }
             else if (rotation_animation.rotate_z) {
@@ -117,6 +128,9 @@
 
                 if (--rotation_animation.animation_residue == 0) {
                     rotation_animation.rotate_z = false;
+					
+					CUBE2048.gravity.rotate( (- rotation_animation.rotation_direction)*Math.PI/2, Z_axis );
+					CUBE2048.shift_cubes();
                 }
             }
         }
@@ -158,6 +172,6 @@ function release() {
 
  </script>
 
-
 </body>
+	
 </html>
