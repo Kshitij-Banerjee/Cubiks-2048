@@ -19,27 +19,10 @@ function GAME(size) {
     this.gravity = new threeD_vector();
     this.coord = new createcoord();
 
-	// To print the current gravity direction....
-    // div = document.createElement('div');
-    // div.id = "i";
-    // document.body.appendChild(div);
-    // div = document.createElement('div');
-    // div.id = "j";
-    // document.body.appendChild(div);
-    // div = document.createElement('div');
-    // div.id = "k";
-    // document.body.appendChild(div);
-    // div = document.createElement('div');
-    // div.id = "x";
-    // document.body.appendChild(div);
-
-    // $("#i").text(this.gravity.direction.x);
-    // $("#j").text(this.gravity.direction.y);
-    // $("#k").text(this.gravity.direction.z);
+    this.tweens = new Object();
 	
 	this.add_random_cube();
 	this.shift_cubes();
-
 };
 
 GAME.prototype.create_random_number = function (limit) {
@@ -76,7 +59,7 @@ GAME.prototype.add_random_cube = function () {
 
     // No more to add..
     if (this.filled_cubes == this.cube_count) {
-        release();
+        release( 'Game Over!!' );
         return;
     }
 
@@ -119,6 +102,46 @@ GAME.prototype.is_in_bound = function( i2, j2 , k2 ){
 
     return true;
 };
+
+
+GAME.prototype.do_texture_events = function (index, index2, i2, j2, k2) {
+    var next_texture = this.cube_array[index].material.map;
+
+    if (next_texture == textures[2048]) {
+        renderer.render(scene, camera);
+        alert(" Did you just win? !!");
+        release('Yes you did! You won! Yay!! :) ');
+        return true;
+    }
+    else if( next_texture == textures[512])
+    {
+        var go = new TWEEN.Tween(this.cube_array[index].scale)
+                        .to({ x: 1.1, y: 1.1, z: 1.1 }, 500)
+                        .easing(TWEEN.Easing.Sinusoidal.In)
+                        .start();
+
+        var back = new TWEEN.Tween(this.cube_array[index].scale)
+                        .to({ x: 1.0, y: 1.0, z: 1.0 }, 500)
+                        .easing(TWEEN.Easing.Sinusoidal.In);
+
+        go.chain(back);
+        back.chain(go);
+
+        this.tweens[this.cube_array[index].uuid] = go;
+    }
+    //else if (next_texture == textures[1024])
+    //{
+    //    if (this.tweens[this.cube_array[index].uuid] != undefined)
+    //        this.tweens[this.cube_array[index].uuid].stop();
+    //    //delete this.tweens[this.cube_array[index].uuid];
+    //    if( this.tweens[this.cube_array[index2].uuid] != undefined )
+    //        this.tweens[this.cube_array[index2].uuid].stop();
+    //    //delete this.tweens[this.cube_array[index2].uuid];
+    //}
+
+    return false;
+}
+
 
 var counter = 0;
 GAME.prototype.sift_cube = function ( i, j, k, direction ) {
@@ -163,6 +186,9 @@ GAME.prototype.sift_cube = function ( i, j, k, direction ) {
 
             var next_texture = textures[next_map(this.cube_array[start_index].material.map)];
             this.cube_array[start_index].material.map = next_texture;
+            
+            if (this.do_texture_events(start_index, last_index, i2, j2, k2))
+                return;
         }
         else{
             // Move to the next free block.
@@ -192,7 +218,7 @@ GAME.prototype.sift_cube = function ( i, j, k, direction ) {
 
     this.cube_array[start_index].animation = {
                 "name": ("Cube_down" + (++counter)),
-                "length": 0.5,
+                "length": 0.3,
                 "hierarchy": [
                     {
                         "parent": -1,
@@ -204,7 +230,7 @@ GAME.prototype.sift_cube = function ( i, j, k, direction ) {
                                 "scl": [1, 1, 1]
                             },
                             {
-                                "time": 0.5,
+                                "time": 0.3,
                                 "pos": [last_coord.x, last_coord.y, last_coord.z]
                             }
                         ]
@@ -217,7 +243,7 @@ GAME.prototype.sift_cube = function ( i, j, k, direction ) {
             var cube_anim = new THREE.Animation(this.cube_array[start_index], this.cube_array[start_index].animation.name);
             cube_anim.loop = false;
             cube_anim.interpolationType = THREE.AnimationHandler.LINEAR;
-            cube_anim.play(false, 0);
+            cube_anim.play();
 
             this.cube_array[last_index] = this.cube_array[start_index];
             this.cube_array[start_index] = 0;
