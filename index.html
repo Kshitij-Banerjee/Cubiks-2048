@@ -1,4 +1,4 @@
-<meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
+﻿<meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
 
 <html>
 <head>
@@ -10,6 +10,7 @@
 <script src="./libs/jquery.min.js"> </script>
 <script src="./libs/three.js"> </script>
 <script src="./libs/keyboard.js"></script>
+<script src="./libs/Tween.js"></script>
 <script src="./js/cube.js"></script>
 <script src="./js/gravity.js"></script>
 <script src="./js/Game.js"></script>
@@ -28,7 +29,13 @@
         4: THREE.ImageUtils.loadTexture('./Textures/Texture_4.gif'),
         8: THREE.ImageUtils.loadTexture('./Textures/Texture_8.gif'),
         16: THREE.ImageUtils.loadTexture('./Textures/Texture_16.gif'),
-        32: THREE.ImageUtils.loadTexture('./Textures/Texture_32.gif')
+        32: THREE.ImageUtils.loadTexture('./Textures/Texture_32.gif'),
+        64: THREE.ImageUtils.loadTexture('./Textures/Texture_64.gif'),
+        128: THREE.ImageUtils.loadTexture('./Textures/Texture_128.gif'),
+        256: THREE.ImageUtils.loadTexture('./Textures/Texture_256.gif'),
+        512: THREE.ImageUtils.loadTexture('./Textures/Texture_512.gif'),
+        1024: THREE.ImageUtils.loadTexture('./Textures/Texture_1024.gif'),
+        2048: THREE.ImageUtils.loadTexture('./Textures/Texture_2048.gif')
     }
 
     var clock = new THREE.Clock();
@@ -101,6 +108,7 @@
 
     function animate() {
         requestAnimationFrame(animate);
+        TWEEN.update();
 
         if (rotation_animation.is_animating()) {
             if (rotation_animation.rotate_x) {
@@ -141,7 +149,7 @@
         renderer.render(scene, camera);
     };
 
-function release() {
+function release( msg ) {
 
     var len = cube_group.children.length;
     for (var i = 0 ; i < len ; i++ )
@@ -165,7 +173,7 @@ function release() {
     KeyboardJS.clear('left');
     KeyboardJS.clear('right');
 
-    alert("Game Over!");
+    alert(msg);
 
     init();
  };
