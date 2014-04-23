@@ -20,6 +20,7 @@ function GAME(size) {
     this.coord = new createcoord();
 
     this.tweens = new Object();
+    this.removal_queue = [];
 	
 	this.add_random_cube();
 	this.shift_cubes();
@@ -113,8 +114,7 @@ GAME.prototype.do_texture_events = function (index, index2, i2, j2, k2) {
         release('Yes you did! You won! Yay!! :) ');
         return true;
     }
-    else if( next_texture == textures[512])
-    {
+    else if (next_texture == textures[512]) {
         var go = new TWEEN.Tween(this.cube_array[index].scale)
                         .to({ x: 1.1, y: 1.1, z: 1.1 }, 500)
                         .easing(TWEEN.Easing.Sinusoidal.In)
@@ -140,8 +140,38 @@ GAME.prototype.do_texture_events = function (index, index2, i2, j2, k2) {
     //}
 
     return false;
-}
+};
 
+GAME.prototype.get_id = function (obj) {
+    return obj.uuid;
+};
+
+GAME.prototype.merge_cubes = function(last_index)
+{
+    this.removal_queue.push(this.cube_array[last_index]);
+    this.cube_array[last_index].transparent = false;
+    this.cube_array[last_index].opacity = 1;
+    this.cube_array[last_index] = 0;
+    this.filled_cubes--;   
+
+    var length = 100;
+    var tween = new TWEEN.Tween(CUBE2048.removal_queue[0].scale).
+                    to({ x: 1.2, y: 1.2, z: 1.2 }, length).
+                    easing(TWEEN.Easing.Sinusoidal.In)
+                    .start();
+
+    var tween2 = new TWEEN.Tween(CUBE2048.removal_queue[0].scale).
+                    to({ x: 1.0, y: 1.0, z: 1.0 }, length).
+                    easing(TWEEN.Easing.Sinusoidal.In)
+                    .onComplete(function () {
+                        var removal = CUBE2048.removal_queue.shift();
+                        cube_group.remove(removal);
+                        delete removal;
+                    });
+
+    tween.chain(tween2);
+
+};
 
 var counter = 0;
 GAME.prototype.sift_cube = function ( i, j, k, direction ) {
@@ -177,15 +207,11 @@ GAME.prototype.sift_cube = function ( i, j, k, direction ) {
 
         if (this.cube_array[start_index].material.map == this.cube_array[last_index].material.map ) 
         {
-			
-			console.log( start_index + " Merged with " + last_index );
-				
-            cube_group.remove(this.cube_array[last_index]);
-            this.cube_array[last_index] = 0;
-            this.filled_cubes--;
+            this.merge_cubes(last_index);
+            var next_text = next_map(this.cube_array[start_index].material.map);
+            console.log("Merging " + start_index + " with " + last_index + " New texture : " + next_text);
 
-            var next_texture = textures[next_map(this.cube_array[start_index].material.map)];
-            this.cube_array[start_index].material.map = next_texture;
+            this.cube_array[start_index].material.map = textures[next_text];
             
             if (this.do_texture_events(start_index, last_index, i2, j2, k2))
                 return;
