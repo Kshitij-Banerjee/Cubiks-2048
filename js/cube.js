@@ -1,6 +1,6 @@
 function create_outer_cube(cube_dim) {
-    var cube_geo = new THREE.CubeGeometry(cube_dim, cube_dim, cube_dim);
-    var cube_mat = new THREE.MeshBasicMaterial({ color: 0x589768, opacity: 0.1, transparent: true });
+    var cube_geo = new THREE.SphereGeometry(cube_dim / 2, 32, 32);
+    var cube_mat = new THREE.MeshBasicMaterial({ color: 0x000000, opacity: 0.5, transparent: true});
     return new THREE.Mesh(cube_geo, cube_mat);
 
 };
@@ -20,6 +20,13 @@ function create_inner_cube(cube_dim) {
 
     cube_mat = new THREE.MeshBasicMaterial({ map: texture, transparent: true, opacity: 0.8 });
     return new THREE.Mesh(cube_geo, cube_mat);
+};
+
+function create_frame(frame_dim) {
+    var frame = new THREE.BoxHelper();
+    frame.material.color.setRGB(0, 0, 0);
+    frame.scale.set(frame_dim, frame_dim, frame_dim);
+    return frame;
 };
 
 function bind_keyboard_keys() {

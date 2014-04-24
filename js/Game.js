@@ -59,14 +59,14 @@ GAME.prototype.coord_to_index = function( i, j, k ){
 GAME.prototype.add_random_cube = function () {
 
     // No more to add..
-    if (this.filled_cubes == this.cube_count) {
+    if (this.filled_cubes == (this.cube_count - 1)) {
         release( 'Game Over!!' );
         return;
     }
 
     var rand = this.create_random_number(this.cube_count);
 
-    while (this.cube_array[rand] != 0) {
+    while (this.cube_array[rand] != 0 || (rand == 13) ) {
         rand++;
         if (rand == this.cube_count)
             rand = 0;
@@ -156,7 +156,7 @@ GAME.prototype.merge_cubes = function(last_index)
 
     var length = 100;
     var tween = new TWEEN.Tween(CUBE2048.removal_queue[0].scale).
-                    to({ x: 1.2, y: 1.2, z: 1.2 }, length).
+                    to({ x: 1.2, y: 1.2, z: 1.2 }, length/2).
                     easing(TWEEN.Easing.Sinusoidal.In)
                     .start();
 
@@ -176,6 +176,9 @@ GAME.prototype.merge_cubes = function(last_index)
 var counter = 0;
 GAME.prototype.sift_cube = function ( i, j, k, direction ) {
 
+    if ((i == 1) && (j == 1) && (k == 1))
+        return;
+
     var start_index = this.coord_to_index(i, j, k)
 
     this.fill_coord( start_index, this.coord);
@@ -191,13 +194,20 @@ GAME.prototype.sift_cube = function ( i, j, k, direction ) {
     var k2 = k + direction.z;
     var last_index = this.coord_to_index(i2, j2, k2);
 
+    if ((i2 == 1) && (j2 == 1) && (k2 == 1))
+        return;
+
     while( this.is_in_bound( i2, j2, k2) && (this.cube_array[last_index] == 0) )
     {
         i2 += direction.x;
         j2 += direction.y;
         k2 += direction.z;
+
+        if ((i2 == 1) && (j2 == 1) && (k2 == 1))
+            return;
+
         last_index = this.coord_to_index(i2, j2, k2);
-    }   
+    }    
 
     // Either we are out of bound or we are filled..
 
@@ -244,7 +254,7 @@ GAME.prototype.sift_cube = function ( i, j, k, direction ) {
 
     this.cube_array[start_index].animation = {
                 "name": ("Cube_down" + (++counter)),
-                "length": 0.3,
+                "length": 0.2,
                 "hierarchy": [
                     {
                         "parent": -1,
@@ -256,7 +266,7 @@ GAME.prototype.sift_cube = function ( i, j, k, direction ) {
                                 "scl": [1, 1, 1]
                             },
                             {
-                                "time": 0.3,
+                                "time": 0.2,
                                 "pos": [last_coord.x, last_coord.y, last_coord.z]
                             }
                         ]
@@ -320,4 +330,35 @@ GAME.prototype.shift_cubes = function () {
             }
         }
     }  
+};
+
+function release(msg) {
+
+    var len = cube_group.children.length;
+    for (var i = 0 ; i < len ; i++) {
+        cube_group.remove(cube_group.children[0]);
+    }
+
+    len = scene.children.length;
+    for (var i = 0 ; i < len; i++) {
+        scene.remove(scene.children[0]);
+    }
+
+    renderer.render(scene, camera);
+
+    delete CUBE2048;
+    delete cube_group;
+    delete scene;
+    delete camera;
+    delete renderer;
+    $("div").remove();
+
+    KeyboardJS.clear('down');
+    KeyboardJS.clear('up');
+    KeyboardJS.clear('left');
+    KeyboardJS.clear('right');
+
+    alert(msg);
+
+    init();
 };
