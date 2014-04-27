@@ -1,10 +1,3 @@
-function create_outer_cube(cube_dim) {
-    var cube_geo = new THREE.SphereGeometry(cube_dim / 2, 32, 32);
-    var cube_mat = new THREE.MeshBasicMaterial({ color: 0x000000, opacity: 0.5, transparent: true});
-    return new THREE.Mesh(cube_geo, cube_mat);
-
-};
-
 function create_inner_cube(cube_dim) {
     var offset = 10;
 
@@ -38,9 +31,6 @@ function bind_keyboard_keys() {
             rotation_animation.animation_residue = rotation_animation.animation_duration;
             rotation_animation.rotation_direction = +1;
             rotation_animation.rotate_x = true;
-
-           // CUBE2048.gravity.rotate(-Math.PI / 2, X_axis);
-           // CUBE2048.shift_cubes();
         }
     });
 
@@ -52,9 +42,6 @@ function bind_keyboard_keys() {
             rotation_animation.animation_residue = rotation_animation.animation_duration;
             rotation_animation.rotation_direction = -1;
             rotation_animation.rotate_x = true;
-
-           // CUBE2048.gravity.rotate(Math.PI / 2, X_axis);
-          //  CUBE2048.shift_cubes();
         }
     });
 
@@ -66,9 +53,6 @@ function bind_keyboard_keys() {
             rotation_animation.animation_residue = rotation_animation.animation_duration;
             rotation_animation.rotation_direction = +1
             rotation_animation.rotate_z = true;
-
-           // CUBE2048.gravity.rotate(-Math.PI / 2, Z_axis);
-           // CUBE2048.shift_cubes();
         }
     });
 
@@ -79,9 +63,6 @@ function bind_keyboard_keys() {
             rotation_animation.animation_residue = rotation_animation.animation_duration;
             rotation_animation.rotation_direction = -1;
             rotation_animation.rotate_z = true;
-
-           // CUBE2048.gravity.rotate( Math.PI/2, Z_axis);
-          //  CUBE2048.shift_cubes();
         }
 
     });

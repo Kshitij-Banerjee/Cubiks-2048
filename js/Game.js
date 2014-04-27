@@ -66,7 +66,7 @@ GAME.prototype.add_random_cube = function () {
 
     var rand = this.create_random_number(this.cube_count);
 
-    while (this.cube_array[rand] != 0 || (rand == 13) ) {
+    while (this.cube_array[rand] != 0 ) {
         rand++;
         if (rand == this.cube_count)
             rand = 0;
@@ -129,15 +129,6 @@ GAME.prototype.do_texture_events = function (index, index2, i2, j2, k2) {
 
         this.tweens[this.cube_array[index].uuid] = go;
     }
-    //else if (next_texture == textures[1024])
-    //{
-    //    if (this.tweens[this.cube_array[index].uuid] != undefined)
-    //        this.tweens[this.cube_array[index].uuid].stop();
-    //    //delete this.tweens[this.cube_array[index].uuid];
-    //    if( this.tweens[this.cube_array[index2].uuid] != undefined )
-    //        this.tweens[this.cube_array[index2].uuid].stop();
-    //    //delete this.tweens[this.cube_array[index2].uuid];
-    //}
 
     return false;
 };
@@ -176,15 +167,9 @@ GAME.prototype.merge_cubes = function(last_index)
 var counter = 0;
 GAME.prototype.sift_cube = function ( i, j, k, direction ) {
 
-    if ((i == 1) && (j == 1) && (k == 1))
-        return;
-
     var start_index = this.coord_to_index(i, j, k)
 
     this.fill_coord( start_index, this.coord);
-
-    //if (this.coord.x != i || this.coord.y != j || this.coord.z != k)
-    //    return false;
 
     if (this.cube_array[start_index] == 0)
         return;
@@ -194,17 +179,11 @@ GAME.prototype.sift_cube = function ( i, j, k, direction ) {
     var k2 = k + direction.z;
     var last_index = this.coord_to_index(i2, j2, k2);
 
-    if ((i2 == 1) && (j2 == 1) && (k2 == 1))
-        return;
-
     while( this.is_in_bound( i2, j2, k2) && (this.cube_array[last_index] == 0) )
     {
         i2 += direction.x;
         j2 += direction.y;
         k2 += direction.z;
-
-        if ((i2 == 1) && (j2 == 1) && (k2 == 1))
-            return;
 
         last_index = this.coord_to_index(i2, j2, k2);
     }    
