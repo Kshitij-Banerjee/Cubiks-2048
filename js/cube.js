@@ -1,5 +1,5 @@
 function create_inner_cube(cube_dim) {
-    var offset = 10;
+    var offset = 0;
 
     cube_dim -= offset;
     cube_geo = new THREE.CubeGeometry(cube_dim, cube_dim, cube_dim);

@@ -76,17 +76,17 @@ function init() {
     renderer.setClearColor(0xfaf8ef);
 
     $("#game_container").append(renderer.domElement);
-
-    // Axis
-
-   // var axisHelper = new THREE.AxisHelper(5);
-   // scene.add(axisHelper);
-
-    // Outer box..
-
-    cube_group.add(create_frame(50));
+    $("#game_container").click(
+        function () {
+            renderer.render(scene, camera);
+        }
+     );
 
     bind_keyboard_keys();
+
+    $(".restart-button").click(function () {
+        release();
+    });
 };
 
 window.addEventListener("keydown", function (e) {
@@ -103,35 +103,45 @@ function animate() {
 
     if (rotation_animation.is_animating()) {
         if (rotation_animation.rotate_x) {
-            rotateAroundWorldAxis(cube_group, X_axis, rotation_animation.rotation_direction * rotation_animation.get_offset());
+            if (rotation_animation.animation_residue > 0)
+                rotateAroundWorldAxis(cube_group, X_axis, rotation_animation.rotation_direction * rotation_animation.get_offset());
 
-            if (--rotation_animation.animation_residue == 0) {
+            if (--rotation_animation.animation_residue == -10) {
                 rotation_animation.rotate_x = false;
+            }
 
+            if (rotation_animation.animation_residue == 0) {
                 CUBE2048.gravity.rotate((-rotation_animation.rotation_direction) * Math.PI / 2, X_axis);
                 CUBE2048.shift_cubes();
             }
         }
+        
         else if (rotation_animation.rotate_y) {
-            rotateAroundWorldAxis(cube_group, Y_axis, rotation_animation.rotation_direction * rotation_animation.get_offset());
+            if (rotation_animation.animation_residue > 0)
+                rotateAroundWorldAxis(cube_group, Y_axis, rotation_animation.rotation_direction * rotation_animation.get_offset());
 
-            if (--rotation_animation.animation_residue == 0) {
+            if (--rotation_animation.animation_residue == -10) {
                 rotation_animation.rotate_y = false;
-
-                CUBE2048.gravity.rotate((-rotation_animation.rotation_direction) * Math.PI / 2, Y_axis);
-                CUBE2048.shift_cubes();
             }
-        }
+
+                if (rotation_animation.animation_residue == 0) {
+                    CUBE2048.gravity.rotate((-rotation_animation.rotation_direction) * Math.PI / 2, Y_axis);
+                    CUBE2048.shift_cubes();
+                }
+            }
+        
         else if (rotation_animation.rotate_z) {
-            rotateAroundWorldAxis(cube_group, Z_axis, rotation_animation.rotation_direction * rotation_animation.get_offset());
+            if(rotation_animation.animation_residue > 0 )
+                rotateAroundWorldAxis(cube_group, Z_axis, rotation_animation.rotation_direction * rotation_animation.get_offset());
 
-            if (--rotation_animation.animation_residue == 0) {
+            if (--rotation_animation.animation_residue == -10) {
                 rotation_animation.rotate_z = false;
-
-                CUBE2048.gravity.rotate((-rotation_animation.rotation_direction) * Math.PI / 2, Z_axis);
-                CUBE2048.shift_cubes();
             }
-        }
+                if (rotation_animation.animation_residue == 0) {
+                    CUBE2048.gravity.rotate((-rotation_animation.rotation_direction) * Math.PI / 2, Z_axis);
+                    CUBE2048.shift_cubes();
+                }
+            }        
     }
 
     // For the inner blocks..
@@ -144,7 +154,10 @@ function animate() {
 function release(msg) {
 
     $("canvas").css({ opacity: 0.5 });
-    alert(msg);
+
+    if (msg != undefined)
+        alert(msg);
+
     $("#game_container").empty();
 
     var len = cube_group.children.length;
