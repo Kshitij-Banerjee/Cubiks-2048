@@ -41,8 +41,8 @@ GAME.prototype.fill_coord = function (rand, coord) {
     coord.z = Math.floor(coord.z - Math.floor(this.game_size / 2));
 
     coord.x *= (100 / this.game_size);
-    coord.y *= (100 / this.game_size);
-    coord.z *= (100 / this.game_size);
+    coord.y *= (100/ this.game_size);
+    coord.z *= (100/ this.game_size);
 };
 
 GAME.prototype.coord_to_index = function( i, j, k ){
@@ -120,7 +120,7 @@ GAME.prototype.do_texture_events = function (index, index2, i2, j2, k2) {
     }
     else if (next_texture == textures[512]) {
         var go = new TWEEN.Tween(this.cube_array[index].scale)
-                        .to({ x: 1.1, y: 1.1, z: 1.1 }, 500)
+                        .to({ x: 1.2, y: 1.2, z: 1.2 }, 500)
                         .easing(TWEEN.Easing.Sinusoidal.In)
                         .start();
 
@@ -143,14 +143,14 @@ GAME.prototype.merge_cubes = function(last_index)
     this.cube_array[last_index] = 0;
     this.filled_cubes--;   
 
-    var length = 100;
-    var tween = new TWEEN.Tween(CUBE2048.removal_queue[0].scale).
-                    to({ x: 1.2, y: 1.2, z: 1.2 }, length/2).
+    var length = 200;
+    var tween = new TWEEN.Tween(this.removal_queue[0].scale).
+                    to({ x: 1.3, y: 1.3, z: 1.3 }, length).
                     easing(TWEEN.Easing.Sinusoidal.In)
                     .start();
 
-    var tween2 = new TWEEN.Tween(CUBE2048.removal_queue[0].scale).
-                    to({ x: 1.0, y: 1.0, z: 1.0 }, length).
+    var tween2 = new TWEEN.Tween(this.removal_queue[0].scale).
+                    to({ x: 1.0, y: 1.0, z: 1.0 }, length/2).
                     easing(TWEEN.Easing.Sinusoidal.In)
                     .onComplete(function () {
                         var removal = CUBE2048.removal_queue.shift();
@@ -159,7 +159,6 @@ GAME.prototype.merge_cubes = function(last_index)
                     });
 
     tween.chain(tween2);
-
 };
 
 var counter = 0;
@@ -196,7 +195,7 @@ GAME.prototype.sift_cube = function ( i, j, k, direction ) {
         {
             this.merge_cubes(last_index);
             var next_text = next_map(this.cube_array[start_index].material.map);
-            console.log("Merging " + start_index + " with " + last_index + " New texture : " + next_text);
+            //console.log("Merging " + start_index + " with " + last_index + " New texture : " + next_text);
 
             this.cube_array[start_index].material.map = textures[next_text];
             
@@ -219,6 +218,7 @@ GAME.prototype.sift_cube = function ( i, j, k, direction ) {
 
     start_index = this.coord_to_index( i, j, k);
     last_index = this.coord_to_index( i2, j2, k2);
+        
 
     if (start_index == last_index)
         return;
@@ -229,37 +229,15 @@ GAME.prototype.sift_cube = function ( i, j, k, direction ) {
     this.fill_coord(start_index, start_coord);
     this.fill_coord(last_index, last_coord);
 
-    this.cube_array[start_index].animation = {
-                "name": ("Cube_down" + (++counter)),
-                "length": 0.2,
-                "hierarchy": [
-                    {
-                        "parent": -1,
-                        "keys": [
-                            {
-                                "time": 0,
-                                "pos": [start_coord.x, start_coord.y, start_coord.z],
-                                "rot": [0, 0, 0],
-                                "scl": [1, 1, 1]
-                            },
-                            {
-                                "time": 0.2,
-                                "pos": [last_coord.x, last_coord.y, last_coord.z]
-                            }
-                        ]
-                    }
-                ]
-            };
+    //console.log("Final coord : \t" + last_coord.x + "\t " + last_coord.y+ "\t " + last_coord.z);
 
-            THREE.AnimationHandler.add(this.cube_array[start_index].animation);
+    new TWEEN.Tween(this.cube_array[start_index].position)
+        .to({ x: last_coord.x, y: last_coord.y, z: last_coord.z }, 800)
+        .easing( TWEEN.Easing.Bounce.Out )
+        .start();
 
-            var cube_anim = new THREE.Animation(this.cube_array[start_index], this.cube_array[start_index].animation.name);
-            cube_anim.loop = false;
-            cube_anim.interpolationType = THREE.AnimationHandler.LINEAR;
-            cube_anim.play();
-
-            this.cube_array[last_index] = this.cube_array[start_index];
-            this.cube_array[start_index] = 0;
+    this.cube_array[last_index] = this.cube_array[start_index];
+    this.cube_array[start_index] = 0;
 };
 
 GAME.prototype.shift_cubes = function () {
