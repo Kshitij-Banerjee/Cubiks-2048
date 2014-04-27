@@ -1,0 +1,174 @@
+var renderer, scene, camera, cube_group;
+var cube_size = 3;
+var CUBE2048;
+var X_axis = new THREE.Vector3(1, 0, 0);
+var Y_axis = new THREE.Vector3(0, 1, 0);
+var Z_axis = new THREE.Vector3(0, 0, 1);
+
+var textures;
+
+var clock = new THREE.Clock();
+
+init();
+
+animate();
+
+function init() {
+
+    textures = {
+        2: THREE.ImageUtils.loadTexture('./Textures/Texture_2.gif'),
+        4: THREE.ImageUtils.loadTexture('./Textures/Texture_4.gif'),
+        8: THREE.ImageUtils.loadTexture('./Textures/Texture_8.gif'),
+        16: THREE.ImageUtils.loadTexture('./Textures/Texture_16.gif'),
+        32: THREE.ImageUtils.loadTexture('./Textures/Texture_32.gif'),
+        64: THREE.ImageUtils.loadTexture('./Textures/Texture_64.gif'),
+        128: THREE.ImageUtils.loadTexture('./Textures/Texture_128.gif'),
+        256: THREE.ImageUtils.loadTexture('./Textures/Texture_256.gif'),
+        512: THREE.ImageUtils.loadTexture('./Textures/Texture_512.gif'),
+        1024: THREE.ImageUtils.loadTexture('./Textures/Texture_1024.gif'),
+        2048: THREE.ImageUtils.loadTexture('./Textures/Texture_2048.gif')
+    };
+
+    scene = new THREE.Scene();
+    // The plane platform.
+
+    var plane = new THREE.PlaneGeometry(1000, 1000, 100, 100);
+    var plane_mat = new THREE.MeshBasicMaterial({ color: 0x708090, transparent: true, opacity: 0.4 });
+    var plane_mesh = new THREE.Mesh(plane, plane_mat);
+    scene.add(plane_mesh);
+    plane_mesh.position.set(50, -1000 / cube_size, 0);
+    plane_mesh.rotation.x -= 1.5;
+
+    // Cameras
+
+    camera = new THREE.PerspectiveCamera(45, window.innerWidth / window.innerHeight, 1, 10000);
+    camera.position.set(50, 50 + (40 * cube_size), 50 * cube_size);
+    camera.lookAt(new THREE.Vector3(50, 50, 0));
+    scene.add(camera);
+
+
+    // Lights
+
+    var spotLight = new THREE.SpotLight(0xffffff);
+    spotLight.position.set(300, 300, 300);
+    scene.add(spotLight);
+    scene.add(new THREE.AmbientLight(0xffffff));
+
+    // Geometries
+    cube_group = new THREE.Object3D();
+    cube_group.position.set(50, 50, 0);
+
+    //==================================================
+    // Insert debug code from debug.js here...
+    //==================================================
+
+    // Refresh the game.
+
+    CUBE2048 = new GAME(3);
+
+    scene.add(cube_group);
+
+    // Renderer
+
+    renderer = new THREE.WebGLRenderer({ antialias: true });
+    var container = $("#game_container");
+    renderer.setSize( container.width(), container.height());
+    renderer.setClearColor(0xfaf8ef);
+
+    $("#game_container").append(renderer.domElement);
+
+    // Axis
+
+   // var axisHelper = new THREE.AxisHelper(5);
+   // scene.add(axisHelper);
+
+    // Outer box..
+
+    cube_group.add(create_frame(50));
+
+    bind_keyboard_keys();
+};
+
+window.addEventListener("keydown", function (e) {
+    // space and arrow keys
+    if ([32, 37, 38, 39, 40].indexOf(e.keyCode) > -1) {
+        e.preventDefault();
+    }
+}, false);
+
+
+function animate() {
+    requestAnimationFrame(animate);
+    TWEEN.update();
+
+    if (rotation_animation.is_animating()) {
+        if (rotation_animation.rotate_x) {
+            rotateAroundWorldAxis(cube_group, X_axis, rotation_animation.rotation_direction * rotation_animation.get_offset());
+
+            if (--rotation_animation.animation_residue == 0) {
+                rotation_animation.rotate_x = false;
+
+                CUBE2048.gravity.rotate((-rotation_animation.rotation_direction) * Math.PI / 2, X_axis);
+                CUBE2048.shift_cubes();
+            }
+        }
+        else if (rotation_animation.rotate_y) {
+            rotateAroundWorldAxis(cube_group, Y_axis, rotation_animation.rotation_direction * rotation_animation.get_offset());
+
+            if (--rotation_animation.animation_residue == 0) {
+                rotation_animation.rotate_y = false;
+
+                CUBE2048.gravity.rotate((-rotation_animation.rotation_direction) * Math.PI / 2, Y_axis);
+                CUBE2048.shift_cubes();
+            }
+        }
+        else if (rotation_animation.rotate_z) {
+            rotateAroundWorldAxis(cube_group, Z_axis, rotation_animation.rotation_direction * rotation_animation.get_offset());
+
+            if (--rotation_animation.animation_residue == 0) {
+                rotation_animation.rotate_z = false;
+
+                CUBE2048.gravity.rotate((-rotation_animation.rotation_direction) * Math.PI / 2, Z_axis);
+                CUBE2048.shift_cubes();
+            }
+        }
+    }
+
+    // For the inner blocks..
+    THREE.AnimationHandler.update(clock.getDelta());
+
+    renderer.render(scene, camera);
+};
+
+
+function release(msg) {
+
+    $("canvas").css({ opacity: 0.5 });
+    alert(msg);
+    $("#game_container").empty();
+
+    var len = cube_group.children.length;
+    for (var i = 0 ; i < len ; i++) {
+        cube_group.remove(cube_group.children[0]);
+    }
+
+    len = scene.children.length;
+    for (var i = 0 ; i < len; i++) {
+        scene.remove(scene.children[0]);
+    }
+
+    renderer.render(scene, camera);
+
+    delete CUBE2048;
+    delete cube_group;
+    delete scene;
+    delete camera;
+    delete renderer;
+
+    KeyboardJS.clear('down');
+    KeyboardJS.clear('up');
+    KeyboardJS.clear('left');
+    KeyboardJS.clear('right');
+
+    init();
+};

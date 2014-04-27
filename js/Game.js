@@ -19,10 +19,9 @@ function GAME(size) {
     this.gravity = new threeD_vector();
     this.coord = new createcoord();
 
-    this.tweens = new Object();
     this.removal_queue = [];
 	
-	this.add_random_cube();
+	this.add_random_cube( 2 );
 	this.shift_cubes();
 };
 
@@ -55,11 +54,14 @@ GAME.prototype.coord_to_index = function( i, j, k ){
     return numb;
 };
 
+GAME.prototype.add_random_cube = function ( count ) {
 
-GAME.prototype.add_random_cube = function () {
+    if (count == 0)
+        return;
 
     // No more to add..
-    if (this.filled_cubes == (this.cube_count - 1)) {
+    if (this.filled_cubes == this.cube_count) {
+        renderer.render(scene, camera);
         release( 'Game Over!!' );
         return;
     }
@@ -81,6 +83,8 @@ GAME.prototype.add_random_cube = function () {
     this.cube_array[rand] = cube;
 
     this.filled_cubes++;
+
+    this.add_random_cube(--count);
 };
 
 function next_map(map) {
@@ -126,15 +130,9 @@ GAME.prototype.do_texture_events = function (index, index2, i2, j2, k2) {
 
         go.chain(back);
         back.chain(go);
-
-        this.tweens[this.cube_array[index].uuid] = go;
     }
 
     return false;
-};
-
-GAME.prototype.get_id = function (obj) {
-    return obj.uuid;
 };
 
 GAME.prototype.merge_cubes = function(last_index)
@@ -309,35 +307,4 @@ GAME.prototype.shift_cubes = function () {
             }
         }
     }  
-};
-
-function release(msg) {
-
-    var len = cube_group.children.length;
-    for (var i = 0 ; i < len ; i++) {
-        cube_group.remove(cube_group.children[0]);
-    }
-
-    len = scene.children.length;
-    for (var i = 0 ; i < len; i++) {
-        scene.remove(scene.children[0]);
-    }
-
-    renderer.render(scene, camera);
-
-    delete CUBE2048;
-    delete cube_group;
-    delete scene;
-    delete camera;
-    delete renderer;
-    $("div").remove();
-
-    KeyboardJS.clear('down');
-    KeyboardJS.clear('up');
-    KeyboardJS.clear('left');
-    KeyboardJS.clear('right');
-
-    alert(msg);
-
-    init();
 };
