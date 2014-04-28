@@ -76,11 +76,22 @@ function init() {
     renderer.setClearColor(0xfaf8ef);
 
     $("#game_container").append(renderer.domElement);
-    $("#game_container").click(
+
+    $("#game_container").mousedown(function () {
+        CUBE2048.view_sides();
+    });
+
+    $("#game_container").mouseup(function () {
+        CUBE2048.reset_positions();
+    });
+
+    KeyboardJS.on("space",
         function () {
-            renderer.render(scene, camera);
-        }
-     );
+            CUBE2048.view_sides()
+        },
+        function () {
+            CUBE2048.reset_positions()
+        });
 
     bind_keyboard_keys();
 
@@ -143,9 +154,6 @@ function animate() {
                 }
             }        
     }
-
-    // For the inner blocks..
-    THREE.AnimationHandler.update(clock.getDelta());
 
     renderer.render(scene, camera);
 };

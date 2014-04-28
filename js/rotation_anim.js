@@ -10,7 +10,7 @@ function rot_animation(angle_in) {
 }
 
 rot_animation.prototype.is_animating = function () {
-    return (this.rotate_x || this.rotate_y || this.rotate_z);
+    return (this.rotate_x || this.rotate_y || this.rotate_z || CUBE2048.showing_view );
 };
 
 rot_animation.prototype.get_offset = function () {
