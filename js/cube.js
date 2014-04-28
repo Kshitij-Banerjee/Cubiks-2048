@@ -33,7 +33,6 @@ function bind_keyboard_keys() {
 
     KeyboardJS.on('up', function () { // Rotate about x anti-clockwise
 
-
         if (!rotation_animation.is_animating()) {
             CUBE2048.add_random_cube( 2 );
             rotation_animation.animation_residue = rotation_animation.animation_duration;

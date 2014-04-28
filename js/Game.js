@@ -23,6 +23,9 @@ function GAME(size) {
 	
 	this.add_random_cube( 2 );
 	this.shift_cubes();
+
+	this.showing_view = false;
+	this.settled = true;
 };
 
 GAME.prototype.create_random_number = function (limit) {
@@ -231,17 +234,20 @@ GAME.prototype.sift_cube = function ( i, j, k, direction ) {
 
     //console.log("Final coord : \t" + last_coord.x + "\t " + last_coord.y+ "\t " + last_coord.z);
 
+    this.settled = false;
     new TWEEN.Tween(this.cube_array[start_index].position)
         .to({ x: last_coord.x, y: last_coord.y, z: last_coord.z }, 800)
-        .easing( TWEEN.Easing.Bounce.Out )
+        .easing(TWEEN.Easing.Bounce.Out)
+        .onComplete( function (){ CUBE2048.settled = true;} )
         .start();
 
     this.cube_array[last_index] = this.cube_array[start_index];
     this.cube_array[start_index] = 0;
 };
 
+
+
 GAME.prototype.shift_cubes = function () {
-    var order = {};
     if (this.gravity.direction.x != 0) {
         var start = this.gravity.direction.x > 0 ? this.game_size-1 : 0;
         var end = this.gravity.direction.x > 0 ? -1 : this.game_size;
@@ -251,7 +257,7 @@ GAME.prototype.shift_cubes = function () {
         for (var i = start; i != end ; i -= this.gravity.direction.x) {
             for (var j = 0 ; j < this.game_size; j++) {
                 for (var k = 0; k < this.game_size; k++) {
-                   this.sift_cube(i, j, k, this.gravity.direction );
+                    this.sift_cube(i, j, k, this.gravity.direction);                   
                 }
             }
         }
@@ -286,3 +292,121 @@ GAME.prototype.shift_cubes = function () {
         }
     }  
 };
+
+GAME.prototype.translate = function (i, j, k, direction) {
+    var start_index = this.coord_to_index(i, j, k);
+    var coord = new createcoord();
+    this.fill_coord(start_index, coord);
+    if (this.cube_array[start_index] != 0) {
+        new TWEEN.Tween(this.cube_array[start_index].position)
+        .to({
+            x: coord.x + (121 * direction.x),
+            y: coord.y + (121 * direction.y),
+            z: coord.z + (121 * direction.z)
+        }, 100)
+        .start();
+    }
+};
+
+GAME.prototype.view_sides = function () {
+    if (!this.settled)
+        return;
+
+    if (this.showing_view)
+        return;
+
+    var right = this.gravity.right();
+    var left = new THREE.Vector3(0, 0, 0);
+    left.copy( right );
+    left.negate();
+
+    var dirs = [];
+    dirs.push( left );
+    dirs.push( new THREE.Vector3(0, 0, 0) );
+    dirs.push( right );
+
+    if (this.gravity.direction.x != 0) {
+        var start = this.gravity.direction.x > 0 ? this.game_size - 1 : 0;
+        var end = this.gravity.direction.x > 0 ? -1 : this.game_size;
+
+        for (var i = start; i != end ; i -= this.gravity.direction.x) {
+            for (var j = 0 ; j < this.game_size; j++) {
+                for (var k = 0; k < this.game_size; k++) {
+                    this.translate(i, j, k,  dirs[i]);
+                }
+            }
+        }
+    }
+
+    else if (this.gravity.direction.y != 0) {
+        var start = this.gravity.direction.y > 0 ? this.game_size - 1 : 0;
+        var end = this.gravity.direction.y > 0 ? -1 : this.game_size;
+        for (var j = start; j != end ; j -= this.gravity.direction.y) {
+            for (var i = 0 ; i < this.game_size; i++) {
+                for (var k = 0; k < this.game_size; k++) {
+                    this.translate(i, j, k, dirs[j]);
+                }
+            }
+        }
+
+    }
+
+    else if (this.gravity.direction.z != 0) {
+        var start = this.gravity.direction.z > 0 ? this.game_size - 1 : 0;
+        var end = this.gravity.direction.z > 0 ? -1 : this.game_size;
+        for (var k = start; k != end ; k -= this.gravity.direction.z) {
+            for (var i = 0 ; i < this.game_size; i++) {
+                for (var j = 0; j < this.game_size; j++) {
+                    this.translate(i, j, k, dirs[k]);
+                }
+            }
+        }
+    }
+
+    new TWEEN.Tween(camera.position)
+        .to({
+            x: camera.position.x,
+            y: camera.position.y + 100,
+            z: camera.position.z
+        }, 150)
+        .onUpdate(function ()
+        {
+            camera.lookAt(new THREE.Vector3(50, 50, 0));
+        })         
+        .start();
+
+    this.showing_view = true;
+};
+
+GAME.prototype.reset_positions = function()
+{
+
+    if (!this.showing_view)
+        return;
+
+    for( var i = 0 ; i < this.cube_count ; i ++ )
+    {
+        if (this.cube_array[i] != 0) {
+            var coord = new createcoord();
+            this.fill_coord(i, coord);
+            new TWEEN.Tween(this.cube_array[i].position)
+            .to({ x: coord.x, y: coord.y, z: coord.z }, 100)
+            .start();
+        }
+    }
+
+    new TWEEN.Tween(camera.position)
+       .to({
+           x: 50,
+           y: 50 + (40 * cube_size),
+           z: 50 * cube_size
+       },100)
+       .onUpdate(function () {
+           camera.lookAt(new THREE.Vector3(50, 50, 0));
+       })
+       .start();
+
+    this.showing_view = false;
+
+}
+    
