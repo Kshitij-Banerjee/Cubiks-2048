@@ -32,20 +32,28 @@ GAME.prototype.create_random_number = function (limit) {
     return Math.floor(Math.random() * 100) % limit;
 };
 
-GAME.prototype.fill_coord = function (rand, coord) {
+GAME.prototype.index_to_ijk = function ( rand )
+{
+    coord = new createcoord();
     coord.z = Math.floor(rand / (this.game_size * this.game_size)); //  z level
     rand = rand % (this.game_size * this.game_size); // remaining in level
 
     coord.y = Math.floor(rand / this.game_size);
     coord.x = rand % this.game_size;
+    return coord;
+};
 
+GAME.prototype.get_coord = function (rand, coord) {
+    var coord = this.index_to_ijk(rand);
     coord.x = Math.floor(coord.x - Math.floor(this.game_size / 2));
     coord.y = Math.floor(coord.y - Math.floor(this.game_size / 2));
     coord.z = Math.floor(coord.z - Math.floor(this.game_size / 2));
 
     coord.x *= (100 / this.game_size);
     coord.y *= (100/ this.game_size);
-    coord.z *= (100/ this.game_size);
+    coord.z *= (100 / this.game_size);
+
+    return coord;
 };
 
 GAME.prototype.coord_to_index = function( i, j, k ){
@@ -62,13 +70,6 @@ GAME.prototype.add_random_cube = function ( count ) {
     if (count == 0)
         return;
 
-    // No more to add..
-    if (this.filled_cubes == this.cube_count) {
-        renderer.render(scene, camera);
-        release( 'Game Over!!' );
-        return;
-    }
-
     var rand = this.create_random_number(this.cube_count);
 
     while (this.cube_array[rand] != 0 ) {
@@ -77,16 +78,20 @@ GAME.prototype.add_random_cube = function ( count ) {
             rand = 0;
     }
 
-    this.fill_coord(rand, this.coord);
-
+    this.coord = this.get_coord( rand );
+    
     var cube = create_inner_cube(33);
     cube.position.set(this.coord.x, this.coord.y, this.coord.z);
-
+    cube.scale = { x: 0.1, y: 0.1, z: 0.1 };
+    cube.material.opacity = 0.0;
+    new TWEEN.Tween(cube.scale).to({ x: 1.0, y: 1.0, z: 1.0 }, 300).delay(200).start();
+    new TWEEN.Tween(cube.material).to({ opacity:1.0},300).delay(200).start();
     cube_group.add(cube);
     this.cube_array[rand] = cube;
 
     this.filled_cubes++;
-
+    var ijk = this.index_to_ijk(rand);
+    this.sift_cube( ijk.x, ijk.y, ijk.z, this.gravity.direction );
     this.add_random_cube(--count);
 };
 
@@ -169,10 +174,11 @@ GAME.prototype.sift_cube = function ( i, j, k, direction ) {
 
     var start_index = this.coord_to_index(i, j, k)
 
-    this.fill_coord( start_index, this.coord);
+    this.coord = this.get_coord( start_index );
 
+    // No cube at this location.
     if (this.cube_array[start_index] == 0)
-        return;
+        return false;
 
     var i2 = i + direction.x;
     var j2 = j + direction.y;
@@ -203,7 +209,7 @@ GAME.prototype.sift_cube = function ( i, j, k, direction ) {
             this.cube_array[start_index].material.map = textures[next_text];
             
             if (this.do_texture_events(start_index, last_index, i2, j2, k2))
-                return;
+                return true;
         }
         else{
             // Move to the next free block.
@@ -224,13 +230,13 @@ GAME.prototype.sift_cube = function ( i, j, k, direction ) {
         
 
     if (start_index == last_index)
-        return;
+        return false;
 
     var start_coord = new createcoord();
     var last_coord = new createcoord();
 
-    this.fill_coord(start_index, start_coord);
-    this.fill_coord(last_index, last_coord);
+    var start_coord = this.get_coord( start_index );
+    var last_coord = this.get_coord( last_index );
 
     //console.log("Final coord : \t" + last_coord.x + "\t " + last_coord.y+ "\t " + last_coord.z);
 
@@ -243,11 +249,14 @@ GAME.prototype.sift_cube = function ( i, j, k, direction ) {
 
     this.cube_array[last_index] = this.cube_array[start_index];
     this.cube_array[start_index] = 0;
+
+    return true;
 };
 
 
 
 GAME.prototype.shift_cubes = function () {
+    var shifted = false;
     if (this.gravity.direction.x != 0) {
         var start = this.gravity.direction.x > 0 ? this.game_size-1 : 0;
         var end = this.gravity.direction.x > 0 ? -1 : this.game_size;
@@ -257,7 +266,7 @@ GAME.prototype.shift_cubes = function () {
         for (var i = start; i != end ; i -= this.gravity.direction.x) {
             for (var j = 0 ; j < this.game_size; j++) {
                 for (var k = 0; k < this.game_size; k++) {
-                    this.sift_cube(i, j, k, this.gravity.direction);                   
+                    shifted |= this.sift_cube(i, j, k, this.gravity.direction);                   
                 }
             }
         }
@@ -272,7 +281,7 @@ GAME.prototype.shift_cubes = function () {
         for (var j = start; j != end ; j -= this.gravity.direction.y) {
             for (var i = 0 ; i < this.game_size; i++) {
                 for (var k = 0; k < this.game_size; k++) {
-                    this.sift_cube(i, j, k, this.gravity.direction );
+                    shifted |= this.sift_cube(i, j, k, this.gravity.direction);
                 }
             }
         }
@@ -286,17 +295,18 @@ GAME.prototype.shift_cubes = function () {
         for (var k = start; k != end ; k -= this.gravity.direction.z) {
             for (var i = 0 ; i < this.game_size; i++) {
                 for (var j = 0; j < this.game_size; j++) {
-                    this.sift_cube(i, j, k, this.gravity.direction );
+                    shifted |= this.sift_cube(i, j, k, this.gravity.direction);
                 }
             }
         }
-    }  
+    }
+    
+    return shifted;
 };
 
 GAME.prototype.translate = function (i, j, k, direction) {
     var start_index = this.coord_to_index(i, j, k);
-    var coord = new createcoord();
-    this.fill_coord(start_index, coord);
+    var coord =  this.get_coord(start_index, coord);
     if (this.cube_array[start_index] != 0) {
         new TWEEN.Tween(this.cube_array[start_index].position)
         .to({
@@ -387,8 +397,7 @@ GAME.prototype.reset_positions = function()
     for( var i = 0 ; i < this.cube_count ; i ++ )
     {
         if (this.cube_array[i] != 0) {
-            var coord = new createcoord();
-            this.fill_coord(i, coord);
+            var coord = this.get_coord( i );
             new TWEEN.Tween(this.cube_array[i].position)
             .to({ x: coord.x, y: coord.y, z: coord.z }, 100)
             .start();
