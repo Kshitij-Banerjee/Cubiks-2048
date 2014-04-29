@@ -46,7 +46,7 @@ hr {
   margin-bottom: 30px; }
 
 .container {
-  width: 1000px;
+  width: 60%;
   margin: 0 auto; }
 
 
@@ -57,8 +57,8 @@ hr {
   touch-action: none;
   background: #bbada0;
   border-radius: 6px;
-  width: 1000px;
-  height: 750px;
+  width: 100%;
+  height: 85%;
   box-sizing: border-box; }
   .game-container .game-message {
     display: none;
