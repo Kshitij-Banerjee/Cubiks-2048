@@ -75,7 +75,27 @@ function init() {
     renderer.setSize( container.width(), container.height());
     renderer.setClearColor(0xfaf8ef);
 
+    // Make the outer frame..
+
+    var outer_frame = create_frame(50);
+    cube_group.add(outer_frame);
+
+    // And fade it away...
+
+    new TWEEN.Tween(outer_frame.material)
+        .to({ opacity: 0.0 }, 5000)
+        .onComplete(function () {
+            cube_group.remove(outer_frame);
+        })
+        .start();
+
+    // And fade it...
+
+    // Add the canvas to the dom.
+
     $("#game_container").append(renderer.domElement);
+
+    // Add the mouse events
 
     $("#game_container").mousedown(function () {
         CUBE2048.view_sides();
@@ -84,16 +104,12 @@ function init() {
     $("#game_container").mouseup(function () {
         CUBE2048.reset_positions();
     });
-
-    KeyboardJS.on("space",
-        function () {
-            CUBE2048.view_sides()
-        },
-        function () {
-            CUBE2048.reset_positions()
-        });
+    
+    // Keyboard events..
 
     bind_keyboard_keys();
+
+    // Buttons..
 
     $(".restart-button").click(function () {
         release();
@@ -215,6 +231,10 @@ function release(msg) {
     KeyboardJS.clear('up');
     KeyboardJS.clear('left');
     KeyboardJS.clear('right');
+    KeyboardJS.clear('space');
+
+
+    // Restart..
 
     init();
 };

@@ -15,6 +15,7 @@ function create_inner_cube(cube_dim) {
 function create_frame(frame_dim) {
     var frame = new THREE.BoxHelper();
     frame.material.color.setRGB(0, 0, 0);
+    frame.material.transparent = true;
     frame.scale.set(frame_dim, frame_dim, frame_dim);
     return frame;
 };
@@ -58,5 +59,13 @@ function bind_keyboard_keys() {
             rotation_animation.rotate_z = true;
         }
 
+    });
+
+    KeyboardJS.on("space",
+    function () {
+        CUBE2048.view_sides()
+    },
+    function () {
+        CUBE2048.reset_positions()
     });
 };
