@@ -69,6 +69,9 @@ GAME.prototype.add_random_cube = function ( count ) {
 
     if (count == 0)
         return;
+        
+    if( this.filled_cubes == this.cube_count )
+        return;
 
     var rand = this.create_random_number(this.cube_count);
 
