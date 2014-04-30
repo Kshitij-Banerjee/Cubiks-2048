@@ -41,7 +41,7 @@ function init() {
 
     // Cameras
 
-    camera = new THREE.PerspectiveCamera(45, window.innerWidth / window.innerHeight, 1, 10000);
+    camera = new THREE.PerspectiveCamera(60, window.innerWidth / window.innerHeight, 1, 10000);
     camera.position.set(50, 50 + (40 * cube_size), 50 * cube_size);
     camera.lookAt(new THREE.Vector3(50, 50, 0));
     scene.add(camera);
