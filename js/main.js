@@ -15,6 +15,25 @@ animate();
 
 function init() {
 
+    $(".demo-start").click(function () {
+        $(".demo-2").width('100%');
+        $(".demo-2").height('95%');        
+
+        $(".demo-start").fadeOut('slow');
+        $(".demo-start").height('0%');
+        $(".demo-start").css({ opacity: 1.0 } );
+    });
+
+    $(".demo-2").click(function () {
+        $(".demo-2").width('0%');
+        $(".demo-2").height('0%');
+
+        $(".demo-start").width('0%');
+        $(".demo-start").height('0%');
+
+        $("#game_container").show();
+    });
+
     textures = {
         2: THREE.ImageUtils.loadTexture('./Textures/Texture_2.gif'),
         4: THREE.ImageUtils.loadTexture('./Textures/Texture_4.gif'),
@@ -94,6 +113,7 @@ function init() {
     // Add the canvas to the dom.
 
     $("#game_container").append(renderer.domElement);
+    $("#game_container").hide();
 
     // Add the mouse events
 
