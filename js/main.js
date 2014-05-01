@@ -257,4 +257,5 @@ function release(msg) {
     // Restart..
 
     init();
+    $("#game_container").show();
 };
