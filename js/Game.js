@@ -20,12 +20,12 @@ function GAME(size) {
     this.coord = new createcoord();
 
     this.removal_queue = [];
+    this.settle_queue = [];
 	
 	this.add_random_cube( 2 );
 	this.shift_cubes();
 
 	this.showing_view = false;
-	this.settled = true;
 };
 
 GAME.prototype.create_random_number = function (limit) {
@@ -203,15 +203,15 @@ GAME.prototype.sift_cube = function ( i, j, k, direction ) {
     {
         // We found an existing cube. Is it the same texture?
 
-        if (this.cube_array[start_index].material.map == this.cube_array[last_index].material.map ) 
+        if ( this.cube_array[start_index].material.map == this.cube_array[last_index].material.map ) 
         {
-            this.merge_cubes(last_index);
-            var next_text = next_map(this.cube_array[start_index].material.map);
+            this.merge_cubes( last_index );
+            var next_text = next_map( this.cube_array[start_index].material.map );
             //console.log("Merging " + start_index + " with " + last_index + " New texture : " + next_text);
 
             this.cube_array[start_index].material.map = textures[next_text];
             
-            if (this.do_texture_events(start_index, last_index, i2, j2, k2))
+            if ( this.do_texture_events(start_index, last_index, i2, j2, k2) )
                 return true;
         }
         else{
@@ -228,8 +228,8 @@ GAME.prototype.sift_cube = function ( i, j, k, direction ) {
         k2 -= direction.z;
     }
 
-    start_index = this.coord_to_index( i, j, k);
-    last_index = this.coord_to_index( i2, j2, k2);
+    start_index = this.coord_to_index( i, j, k );
+    last_index = this.coord_to_index( i2, j2, k2 );
         
 
     if (start_index == last_index)
@@ -322,7 +322,7 @@ GAME.prototype.translate = function (i, j, k, direction) {
 };
 
 GAME.prototype.view_sides = function () {
-    if (!this.settled)
+    if( TWEEN.getAll().length != 0 )
         return;
 
     if (this.showing_view)

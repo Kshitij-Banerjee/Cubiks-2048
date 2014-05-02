@@ -32,6 +32,7 @@ function init() {
         $(".demo-start").height('0%');
 
         $("#game_container").show();
+        release();
     });
 
     textures = {
