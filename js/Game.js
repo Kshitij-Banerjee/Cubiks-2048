@@ -20,7 +20,6 @@ function GAME(size) {
     this.coord = new createcoord();
 
     this.removal_queue = [];
-    this.settle_queue = [];
 	
 	this.add_random_cube( 2 );
 	this.shift_cubes();
@@ -120,13 +119,13 @@ GAME.prototype.is_in_bound = function( i2, j2 , k2 ){
 };
 
 
+
 GAME.prototype.do_texture_events = function (index, index2, i2, j2, k2) {
     var next_texture = this.cube_array[index].material.map;
 
     if (next_texture == textures[2048]) {
-        renderer.render(scene, camera);
-        alert(" Did you just win? !!");
-        release('Yes you did! You won! Yay!! :) ');
+        TWEEN.removeAll();
+        this.view_sides( true );            
         return true;
     }
     else if (next_texture == textures[512]) {
@@ -321,7 +320,7 @@ GAME.prototype.translate = function (i, j, k, direction) {
     }
 };
 
-GAME.prototype.view_sides = function () {
+GAME.prototype.view_sides = function ( is_win ) {
     if( TWEEN.getAll().length != 0 )
         return;
 
@@ -376,17 +375,37 @@ GAME.prototype.view_sides = function () {
         }
     }
 
-    new TWEEN.Tween(camera.position)
+    if (is_win) {
+        new TWEEN.Tween(camera.position)
         .to({
             x: camera.position.x,
             y: camera.position.y + 100,
             z: camera.position.z
         }, 150)
-        .onUpdate(function ()
-        {
+        .onUpdate(function () {
             camera.lookAt(new THREE.Vector3(50, 50, 0));
-        })         
+        })
+        .delay( 2000 )
+        .onComplete(function () {
+            renderer.render(scene, camera);
+            alert(" Did you just win? !!");
+            release('Yes you did! You won! Yay!! :) ');
+        })
         .start();
+    }
+    else {
+        new TWEEN.Tween(camera.position)
+        .to({
+            x: camera.position.x,
+            y: camera.position.y + 100,
+            z: camera.position.z
+        }, 150)
+        .onUpdate(function () {
+            camera.lookAt(new THREE.Vector3(50, 50, 0));
+        })       
+        .start();
+    }
+    
 
     this.showing_view = true;
 };
