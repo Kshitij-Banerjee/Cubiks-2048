@@ -66,6 +66,18 @@ hr {
     height: 95%;
 }
 
+.donate_button{
+    width: 163px;
+    height: 35px;
+    color: #776e65;
+    font-size: 15pt;
+    font-weight: bold;
+    text-decoration: underline;
+}
+
+td{
+    vertical-align:central;
+}
 .container .demo-2{
     width: 0%;
     height: 0%;
