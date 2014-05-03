@@ -85,8 +85,9 @@ GAME.prototype.add_random_cube = function ( count ) {
     var cube = create_inner_cube(33);
     cube.position.set(this.coord.x, this.coord.y, this.coord.z);
     cube.scale = { x: 0.1, y: 0.1, z: 0.1 };
-    cube.material.opacity = 0.0;
-    new TWEEN.Tween(cube.scale).to({ x: 1.0, y: 1.0, z: 1.0 }, 300).delay(200).start();
+    //cube.material.opacity = 0.0;
+    var scaling = 1.0;
+    new TWEEN.Tween(cube.scale).to({ x: scaling, y: scaling, z: scaling }, 300).delay(200).start();
     new TWEEN.Tween(cube.material).to({ opacity:1.0},300).delay(200).start();
     cube_group.add(cube);
     this.cube_array[rand] = cube;

@@ -8,7 +8,7 @@ function create_inner_cube(cube_dim) {
 
     texture = textures[2];
 
-    cube_mat = new THREE.MeshBasicMaterial({ map: texture, transparent: true, opacity: 0.8 });
+    cube_mat = new THREE.MeshBasicMaterial({ map: texture, transparent: true, opacity: 0.5 });
     return new THREE.Mesh(cube_geo, cube_mat);
 };
 

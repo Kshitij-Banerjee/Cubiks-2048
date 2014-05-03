@@ -93,7 +93,7 @@ function init() {
     renderer = new THREE.WebGLRenderer({ antialias: true });
     var container = $("#game_container");
     renderer.setSize( container.width(), container.height());
-    renderer.setClearColor(0xfaf8ef);
+    renderer.setClearColor(0xe9eaed);
 
     // Make the outer frame..
 
