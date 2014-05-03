@@ -321,7 +321,7 @@ GAME.prototype.translate = function (i, j, k, direction) {
 };
 
 GAME.prototype.view_sides = function ( is_win ) {
-    if( TWEEN.getAll().length != 0 )
+    if( TWEEN.getAll().length > 1 )
         return;
 
     if (this.showing_view)
