@@ -253,6 +253,7 @@ function release(msg) {
     KeyboardJS.clear('left');
     KeyboardJS.clear('right');
     KeyboardJS.clear('space');
+    KeyboardJS.clear('enter');
 
 
     // Restart..

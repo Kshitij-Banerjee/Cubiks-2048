@@ -61,6 +61,11 @@ function bind_keyboard_keys() {
 
     });
 
+    KeyboardJS.on('enter', function () {
+       if(  CUBE2048.shift_cubes() )
+            CUBE2048.add_random_cube(2);
+    });
+
     KeyboardJS.on("space",
     function () {
         CUBE2048.view_sides()

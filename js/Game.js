@@ -129,19 +129,19 @@ GAME.prototype.do_texture_events = function (index, index2, i2, j2, k2) {
         this.view_sides( true );            
         return true;
     }
-    else if (next_texture == textures[512]) {
-        var go = new TWEEN.Tween(this.cube_array[index].scale)
-                        .to({ x: 1.2, y: 1.2, z: 1.2 }, 500)
-                        .easing(TWEEN.Easing.Sinusoidal.In)
-                        .start();
+    //else if (next_texture == textures[512]) {
+    //    var go = new TWEEN.Tween(this.cube_array[index].scale)
+    //                    .to({ x: 1.2, y: 1.2, z: 1.2 }, 500)
+    //                    .easing(TWEEN.Easing.Sinusoidal.In)
+    //                    .start();
 
-        var back = new TWEEN.Tween(this.cube_array[index].scale)
-                        .to({ x: 1.0, y: 1.0, z: 1.0 }, 500)
-                        .easing(TWEEN.Easing.Sinusoidal.In);
+    //    var back = new TWEEN.Tween(this.cube_array[index].scale)
+    //                    .to({ x: 1.0, y: 1.0, z: 1.0 }, 500)
+    //                    .easing(TWEEN.Easing.Sinusoidal.In);
 
-        go.chain(back);
-        back.chain(go);
-    }
+    //    go.chain(back);
+    //    back.chain(go);
+    //}
 
     return false;
 };
@@ -256,8 +256,6 @@ GAME.prototype.sift_cube = function ( i, j, k, direction ) {
     return true;
 };
 
-
-
 GAME.prototype.shift_cubes = function () {
     var shifted = false;
     if (this.gravity.direction.x != 0) {
@@ -322,7 +320,7 @@ GAME.prototype.translate = function (i, j, k, direction) {
 };
 
 GAME.prototype.view_sides = function ( is_win ) {
-    if( TWEEN.getAll().length > 1 )
+    if( TWEEN.getAll().length != 0 )
         return;
 
     if (this.showing_view)
