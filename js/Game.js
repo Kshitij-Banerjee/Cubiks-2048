@@ -428,8 +428,8 @@ GAME.prototype.reset_positions = function()
     new TWEEN.Tween(camera.position)
        .to({
            x: 50,
-           y: 50 + (40 * cube_size),
-           z: 50 * cube_size
+           y: dist/5,
+           z: dist/6
        },100)
        .onUpdate(function () {
            camera.lookAt(new THREE.Vector3(50, 50, 0));

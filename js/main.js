@@ -8,7 +8,10 @@ var Z_axis = new THREE.Vector3(0, 0, 1);
 var textures;
 
 var clock = new THREE.Clock();
-
+var container = $("#game_container");
+var dist;
+var height_zoom = container.height() / 5;
+var width_zoom = container.width() / 5;
 init();
 
 animate();
@@ -16,12 +19,10 @@ animate();
 function init() {
 
     $(".demo-start").click(function () {
-        $(".demo-2").width('100%');
-        $(".demo-2").height('95%');        
+        $(".demo-2").width('69vw');
+        $(".demo-2").height('38.8vw');
 
-        $(".demo-start").fadeOut('slow');
         $(".demo-start").height('0%');
-        $(".demo-start").css({ opacity: 1.0 } );
     });
 
     $(".demo-2").click(function () {
@@ -61,11 +62,15 @@ function init() {
 
     // Cameras
 
-    camera = new THREE.PerspectiveCamera(60, window.innerWidth / window.innerHeight, 1, 10000);
-    camera.position.set(50, 50 + (40 * cube_size), 50 * cube_size);
+    var aspect = container.width() / container.height();
+    camera = new THREE.PerspectiveCamera(60, aspect, 1, 10000);
+
+    var vFOV = camera.fov * Math.PI / 180;        // convert vertical fov to radians
+    dist = 1000 / (2 * Math.tan(vFOV / 2)) ; // visible height
+    
+    camera.position.set(50, dist/5, dist/6);
     camera.lookAt(new THREE.Vector3(50, 50, 0));
     scene.add(camera);
-
 
     // Lights
 
@@ -90,8 +95,7 @@ function init() {
 
     // Renderer
 
-    renderer = new THREE.WebGLRenderer({ antialias: true });
-    var container = $("#game_container");
+    renderer = new THREE.WebGLRenderer({ antialias: true });    
     renderer.setSize( container.width(), container.height());
     renderer.setClearColor(0xe9eaed);
 
