@@ -94,16 +94,30 @@ function init() {
     scene.add(cube_group);
 
     // Renderer
+    try{
+        renderer = new THREE.WebGLRenderer({ antialias: true });    
+        renderer.setSize( container.width(), container.height());
+        renderer.setClearColor(0xe9eaed);
 
-    renderer = new THREE.WebGLRenderer({ antialias: true });    
-    renderer.setSize( container.width(), container.height());
-    renderer.setClearColor(0xe9eaed);
+        // Add the canvas to the dom.
+
+        $("#game_container").append(renderer.domElement);
+        $("#game_container").hide();    // Add the canvas to the dom.
+
+        $("#game_container").append(renderer.domElement);
+        $("#game_container").hide();
+    }
+    catch( ex ){
+        alert(" Your Browser does not support this games technology.. Get chrome/mozilla!");
+        $(".container").text(" Your browser is unsupported/not updated. Please get the latest version of chrome/mozilla to play.");
+        return;
+    }
 
     // Make the outer frame..
 
     var outer_frame = create_frame(50);
     cube_group.add(outer_frame);
-
+        
     // And fade it away...
 
     new TWEEN.Tween(outer_frame.material)
@@ -115,10 +129,8 @@ function init() {
 
     // And fade it...
 
-    // Add the canvas to the dom.
 
-    $("#game_container").append(renderer.domElement);
-    $("#game_container").hide();
+
 
     // Add the mouse events
 
