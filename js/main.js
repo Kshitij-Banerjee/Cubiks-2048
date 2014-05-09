@@ -110,6 +110,7 @@ function init() {
     catch( ex ){
         alert(" Your Browser does not support this games technology.. Get chrome/mozilla!");
         $(".container").text(" Your browser is unsupported/not updated. Please get the latest version of chrome/mozilla to play.");
+        $(".container").append(" <br><br> For Safari: <br><br> Open the Safari menu and select Preferences.<br> <br> Then, click the Advanced tab in the Preferences window.<br>  <br> Then, at the bottom of the window, check the Show Develop menu in menu bar checkbox.<br> <br> Then, open the Develop menu in the menu bar and select Enable WebGL.<br> <br> Have fun!<br> " );
         return;
     }
 
