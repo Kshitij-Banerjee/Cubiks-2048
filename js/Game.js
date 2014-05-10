@@ -20,6 +20,7 @@ function GAME(size) {
     this.coord = new createcoord();
 
     this.removal_queue = [];
+    this.premerges = [] ;
 	
 	this.add_random_cube( 2 );
 	this.shift_cubes();
@@ -67,7 +68,12 @@ GAME.prototype.coord_to_index = function( i, j, k ){
 GAME.prototype.add_random_cube = function ( count ) {
 
     if (count == 0)
+    {
+        while (this.premerges.length)
+            this.premerges.pop();
+
         return;
+    }
         
     if( this.filled_cubes == this.cube_count )
         return;
@@ -84,11 +90,10 @@ GAME.prototype.add_random_cube = function ( count ) {
     
     var cube = create_inner_cube(33);
     cube.position.set(this.coord.x, this.coord.y, this.coord.z);
-    cube.scale = { x: 0.1, y: 0.1, z: 0.1 };
-    //cube.material.opacity = 0.0;
+    cube.scale = { x: 0.0, y: 0.0, z: 0.0 };
     var scaling = 1.0;
-    new TWEEN.Tween(cube.scale).to({ x: scaling, y: scaling, z: scaling }, 300).delay(200).start();
-    new TWEEN.Tween(cube.material).to({ opacity:1.0},300).delay(200).start();
+    new TWEEN.Tween(cube.scale).to({ x: scaling, y: scaling, z: scaling }, 300).delay(400).start();
+    new TWEEN.Tween(cube.material).to({ opacity:1.0},300).delay(400).start();
     cube_group.add(cube);
     this.cube_array[rand] = cube;
 
@@ -98,11 +103,16 @@ GAME.prototype.add_random_cube = function ( count ) {
     this.add_random_cube(--count);
 };
 
-function next_map(map) {
+function get_map_id( map )
+{
     var underscore_idx = map.sourceFile.indexOf("_");
     var dot_idx = map.sourceFile.lastIndexOf(".");
     var index = map.sourceFile.substring(++underscore_idx, dot_idx);
-    index = parseInt(index);
+    return parseInt(index);
+}
+
+function next_map(map) {
+    var index = get_map_id( map );
     return index + index;
 };
 
@@ -119,38 +129,50 @@ GAME.prototype.is_in_bound = function( i2, j2 , k2 ){
     return true;
 };
 
+GAME.prototype.get_512_and_above_count = function () {
+    var count = 0;
 
+    for (var i = 0; i < this.cube_count; i++) {
+        if( this.cube_array[i] != 0 )
+            if (get_map_id(this.cube_array[i].material.map) >= 512)
+                count++;
+    }
+
+    return count;
+};
 
 GAME.prototype.do_texture_events = function (index, index2, i2, j2, k2) {
     var next_texture = this.cube_array[index].material.map;
-
+    
+    // Win!
     if (next_texture == textures[2048]) {
         TWEEN.removeAll();
         this.view_sides( true );            
         return true;
     }
-    //else if (next_texture == textures[512]) {
-    //    var go = new TWEEN.Tween(this.cube_array[index].scale)
-    //                    .to({ x: 1.2, y: 1.2, z: 1.2 }, 500)
-    //                    .easing(TWEEN.Easing.Sinusoidal.In)
-    //                    .start();
+    // Almost there!
+    else if (next_texture == textures[512]) {
+        var go = new TWEEN.Tween(this.cube_array[index].scale)
+                        .to({ x: 1.2, y: 1.2, z: 1.2 }, 500)
+                        .easing(TWEEN.Easing.Sinusoidal.In)
+                        .start();
 
-    //    var back = new TWEEN.Tween(this.cube_array[index].scale)
-    //                    .to({ x: 1.0, y: 1.0, z: 1.0 }, 500)
-    //                    .easing(TWEEN.Easing.Sinusoidal.In);
+        var back = new TWEEN.Tween(this.cube_array[index].scale)
+                        .to({ x: 1.0, y: 1.0, z: 1.0 }, 500)
+                        .easing(TWEEN.Easing.Sinusoidal.In);
 
-    //    go.chain(back);
-    //    back.chain(go);
-    //}
+        go.chain(back);
+        back.chain(go);
+    }
 
     return false;
 };
 
 GAME.prototype.merge_cubes = function(last_index)
 {
+    // Cube to be removed expands a little.
     this.removal_queue.push(this.cube_array[last_index]);
     this.cube_array[last_index].transparent = false;
-    this.cube_array[last_index].opacity = 1;
     this.cube_array[last_index] = 0;
     this.filled_cubes--;   
 
@@ -171,6 +193,18 @@ GAME.prototype.merge_cubes = function(last_index)
 
     tween.chain(tween2);
 };
+
+GAME.prototype.is_premerged = function ( cube ) {
+
+    for (var i = 0; i < this.premerges.length ; i++) {
+        if (this.premerges[i] == cube)
+            return true;
+    }
+
+    return false;
+};
+
+
 
 var counter = 0;
 GAME.prototype.sift_cube = function ( i, j, k, direction ) {
@@ -202,15 +236,20 @@ GAME.prototype.sift_cube = function ( i, j, k, direction ) {
     if( this.is_in_bound( i2, j2, k2) )
     {
         // We found an existing cube. Is it the same texture?
+        // If this was from a previous merge.skip..
 
-        if ( this.cube_array[start_index].material.map == this.cube_array[last_index].material.map ) 
+        if (    !this.is_premerged(this.cube_array[last_index])
+            && (this.cube_array[start_index].material.map == this.cube_array[last_index].material.map))
         {
             this.merge_cubes( last_index );
             var next_text = next_map( this.cube_array[start_index].material.map );
             //console.log("Merging " + start_index + " with " + last_index + " New texture : " + next_text);
 
             this.cube_array[start_index].material.map = textures[next_text];
-            
+
+            // Dont merge on this again.
+            this.premerges.push(this.cube_array[start_index]);
+
             if ( this.do_texture_events(start_index, last_index, i2, j2, k2) )
                 return true;
         }
@@ -245,7 +284,7 @@ GAME.prototype.sift_cube = function ( i, j, k, direction ) {
 
     this.settled = false;
     new TWEEN.Tween(this.cube_array[start_index].position)
-        .to({ x: last_coord.x, y: last_coord.y, z: last_coord.z }, 800)
+        .to({ x: last_coord.x, y: last_coord.y, z: last_coord.z }, 600)
         .easing(TWEEN.Easing.Bounce.Out)
         .onComplete( function (){ CUBE2048.settled = true;} )
         .start();
@@ -320,7 +359,8 @@ GAME.prototype.translate = function (i, j, k, direction) {
 };
 
 GAME.prototype.view_sides = function ( is_win ) {
-    if( TWEEN.getAll().length != 0 )
+
+    if (TWEEN.getAll().length > this.get_512_and_above_count())
         return;
 
     if (this.showing_view)

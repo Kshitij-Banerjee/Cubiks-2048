@@ -104,13 +104,11 @@ function init() {
         $("#game_container").append(renderer.domElement);
         $("#game_container").hide();    // Add the canvas to the dom.
 
-        $("#game_container").append(renderer.domElement);
-        $("#game_container").hide();
     }
     catch( ex ){
         alert(" Your Browser does not support this games technology.. Get chrome/mozilla!");
         $(".container").text(" Your browser is unsupported/not updated. Please get the latest version of chrome/mozilla to play.");
-        $(".container").append(" <br><br> For Safari: <br><br> Open the Safari menu and select Preferences.<br> <br> Then, click the Advanced tab in the Preferences window.<br>  <br> Then, at the bottom of the window, check the Show Develop menu in menu bar checkbox.<br> <br> Then, open the Develop menu in the menu bar and select Enable WebGL.<br> <br> Have fun!<br> " );
+	$(".container").append(" <br><br> For Safari: <br><br> Open the Safari menu and select Preferences.<br> <br> Then, click the Advanced tab in the Preferences window.<br>  <br> Then, at the bottom of the window, check the Show Develop menu in menu bar checkbox.<br> <br> Then, open the Develop menu in the menu bar and select Enable WebGL.<br> <br> Have fun!<br> " );
         return;
     }
 
@@ -127,10 +125,6 @@ function init() {
             cube_group.remove(outer_frame);
         })
         .start();
-
-    // And fade it...
-
-
 
 
     // Add the mouse events
@@ -223,7 +217,7 @@ function animate() {
                     CUBE2048.gravity.rotate((-rotation_animation.rotation_direction) * Math.PI / 2, Z_axis);
                     if( CUBE2048.shift_cubes() )
                     {
-                        CUBE2048.add_random_cube(2);
+                        CUBE2048.add_random_cube(2);                        
                     }
                     else if (CUBE2048.filled_cubes == CUBE2048.cube_count) {
                         renderer.render(scene, camera);
