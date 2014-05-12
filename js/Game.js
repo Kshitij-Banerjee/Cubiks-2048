@@ -20,7 +20,8 @@ function GAME(size) {
     this.coord = new createcoord();
 
     this.removal_queue = [];
-    this.premerges = [] ;
+    this.premerges = [];
+    this.five_one_two_anims = {};
 	
 	this.add_random_cube( 2 );
 	this.shift_cubes();
@@ -152,6 +153,7 @@ GAME.prototype.do_texture_events = function (index, index2, i2, j2, k2) {
     }
     // Almost there!
     else if (next_texture == textures[512]) {
+
         var go = new TWEEN.Tween(this.cube_array[index].scale)
                         .to({ x: 1.2, y: 1.2, z: 1.2 }, 500)
                         .easing(TWEEN.Easing.Sinusoidal.In)
@@ -163,6 +165,10 @@ GAME.prototype.do_texture_events = function (index, index2, i2, j2, k2) {
 
         go.chain(back);
         back.chain(go);
+
+        // Record these for future..
+
+        this.five_one_two_anims[ this.cube_array[index].uuid ] = go;
     }
 
     return false;
@@ -170,11 +176,18 @@ GAME.prototype.do_texture_events = function (index, index2, i2, j2, k2) {
 
 GAME.prototype.merge_cubes = function(last_index)
 {
+    // Remove from 512 array as well
+
+    if (this.five_one_two_anims[this.cube_array[last_index].uuid ] != undefined) {
+        this.five_one_two_anims[this.cube_array[last_index].uuid].stop();
+    }
+
     // Cube to be removed expands a little.
     this.removal_queue.push(this.cube_array[last_index]);
     this.cube_array[last_index].transparent = false;
     this.cube_array[last_index] = 0;
-    this.filled_cubes--;   
+    this.filled_cubes--;
+
 
     var length = 200;
     var tween = new TWEEN.Tween(this.removal_queue[0].scale).
@@ -185,10 +198,13 @@ GAME.prototype.merge_cubes = function(last_index)
     var tween2 = new TWEEN.Tween(this.removal_queue[0].scale).
                     to({ x: 1.0, y: 1.0, z: 1.0 }, length/2).
                     easing(TWEEN.Easing.Sinusoidal.In)
-                    .onComplete(function () {
+                    .onComplete(function () {                       
+
+                        // Remove from removal queue of settles..
+
                         var removal = CUBE2048.removal_queue.shift();
                         cube_group.remove(removal);
-                        delete removal;
+                        delete removal;                        
                     });
 
     tween.chain(tween2);
@@ -203,7 +219,6 @@ GAME.prototype.is_premerged = function ( cube ) {
 
     return false;
 };
-
 
 
 var counter = 0;
@@ -239,6 +254,8 @@ GAME.prototype.sift_cube = function ( i, j, k, direction ) {
         // If this was from a previous merge.skip..
 
         if (    !this.is_premerged(this.cube_array[last_index])
+            && (this.cube_array[start_index] != 0)
+            && (this.cube_array[last_index] != 0)
             && (this.cube_array[start_index].material.map == this.cube_array[last_index].material.map))
         {
             this.merge_cubes( last_index );
