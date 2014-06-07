@@ -8,7 +8,7 @@ function create_inner_cube(cube_dim) {
 
     texture = textures[2];
 
-    cube_mat = new THREE.MeshBasicMaterial({ map: texture, transparent: true, opacity: 0.8 });
+    cube_mat = new THREE.MeshBasicMaterial({ map: texture, transparent: true, opacity: 0.5 });
     return new THREE.Mesh(cube_geo, cube_mat);
 };
 
@@ -59,6 +59,11 @@ function bind_keyboard_keys() {
             rotation_animation.rotate_z = true;
         }
 
+    });
+
+    KeyboardJS.on('enter', function () {
+       if(  CUBE2048.shift_cubes() )
+            CUBE2048.add_random_cube(2);
     });
 
     KeyboardJS.on("space",

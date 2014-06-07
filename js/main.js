@@ -8,7 +8,10 @@ var Z_axis = new THREE.Vector3(0, 0, 1);
 var textures;
 
 var clock = new THREE.Clock();
-
+var container = $("#game_container");
+var dist;
+var height_zoom = container.height() / 5;
+var width_zoom = container.width() / 5;
 init();
 
 animate();
@@ -16,12 +19,10 @@ animate();
 function init() {
 
     $(".demo-start").click(function () {
-        $(".demo-2").width('100%');
-        $(".demo-2").height('95%');        
+        $(".demo-2").width('69vw');
+        $(".demo-2").height('38.8vw');
 
-        $(".demo-start").fadeOut('slow');
         $(".demo-start").height('0%');
-        $(".demo-start").css({ opacity: 1.0 } );
     });
 
     $(".demo-2").click(function () {
@@ -61,11 +62,15 @@ function init() {
 
     // Cameras
 
-    camera = new THREE.PerspectiveCamera(60, window.innerWidth / window.innerHeight, 1, 10000);
-    camera.position.set(50, 50 + (40 * cube_size), 50 * cube_size);
+    var aspect = container.width() / container.height();
+    camera = new THREE.PerspectiveCamera(60, aspect, 1, 10000);
+
+    var vFOV = camera.fov * Math.PI / 180;        // convert vertical fov to radians
+    dist = 1000 / (2 * Math.tan(vFOV / 2)) ; // visible height
+    
+    camera.position.set(50, dist/5, dist/6);
     camera.lookAt(new THREE.Vector3(50, 50, 0));
     scene.add(camera);
-
 
     // Lights
 
@@ -89,17 +94,29 @@ function init() {
     scene.add(cube_group);
 
     // Renderer
+    try{
+        renderer = new THREE.WebGLRenderer({ antialias: true });    
+        renderer.setSize( container.width(), container.height());
+        renderer.setClearColor(0xe9eaed);
 
-    renderer = new THREE.WebGLRenderer({ antialias: true });
-    var container = $("#game_container");
-    renderer.setSize( container.width(), container.height());
-    renderer.setClearColor(0xfaf8ef);
+        // Add the canvas to the dom.
+
+        $("#game_container").append(renderer.domElement);
+        $("#game_container").hide();    // Add the canvas to the dom.
+
+    }
+    catch( ex ){
+        alert(" Your Browser does not support this games technology.. Get chrome/mozilla!");
+        $(".container").text(" Your browser is unsupported/not updated. Please get the latest version of chrome/mozilla to play.");
+		$(".container").append(" <br><br> For Safari: <br><br> Open the Safari menu and select Preferences.<br> <br> Then, click the Advanced tab in the Preferences window.<br>  <br> Then, at the bottom of the window, check the Show Develop menu in menu bar checkbox.<br> <br> Then, open the Develop menu in the menu bar and select Enable WebGL.<br> <br> Have fun!<br> " );
+        return;
+    }
 
     // Make the outer frame..
 
     var outer_frame = create_frame(50);
     cube_group.add(outer_frame);
-
+        
     // And fade it away...
 
     new TWEEN.Tween(outer_frame.material)
@@ -109,12 +126,6 @@ function init() {
         })
         .start();
 
-    // And fade it...
-
-    // Add the canvas to the dom.
-
-    $("#game_container").append(renderer.domElement);
-    $("#game_container").hide();
 
     // Add the mouse events
 
@@ -206,7 +217,7 @@ function animate() {
                     CUBE2048.gravity.rotate((-rotation_animation.rotation_direction) * Math.PI / 2, Z_axis);
                     if( CUBE2048.shift_cubes() )
                     {
-                        CUBE2048.add_random_cube(2);
+                        CUBE2048.add_random_cube(2);                        
                     }
                     else if (CUBE2048.filled_cubes == CUBE2048.cube_count) {
                         renderer.render(scene, camera);
@@ -253,6 +264,7 @@ function release(msg) {
     KeyboardJS.clear('left');
     KeyboardJS.clear('right');
     KeyboardJS.clear('space');
+    KeyboardJS.clear('enter');
 
 
     // Restart..

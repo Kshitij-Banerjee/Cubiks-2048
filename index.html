@@ -1,8 +1,11 @@
 ﻿<meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
-
+<meta name="description" content="A 3D version of 2048. Best intuitive alternative to 2048 puzzle game." />
+<meta name="keywords" content="2048, 3D, cubiks, webgl, puzzle, game, rubik's, cube, brain, teaser" />
+<meta property="og:title" content="3D cubiks 2048 ">
+<meta property="og:description" content="A 3D version of 2048. Best intuitive alternative to 2048 puzzle game." />
 <html>
 <head>
-<title> Cubiks-2048 </title>
+<title> Cubiks-2048 3D</title>
 
 <link rel="stylesheet" type="text/css" href="./styles/container.css">
     <script>
@@ -21,6 +24,18 @@
 </head>
 
 <body>
+
+    <div id="fb-root"></div>
+    <script>
+(function (d, s, id) {
+    var js, fjs = d.getElementsByTagName(s)[0];
+    if (d.getElementById(id)) return;
+    js = d.createElement(s); js.id = id;
+    js.src = "//connect.facebook.net/en_US/sdk.js#xfbml=1&version=v2.0";
+    fjs.parentNode.insertBefore(js, fjs);
+}(document, 'script', 'facebook-jssdk'));</script>
+
+
   <!-- <h1 style="font-size :80px ; text-align:center"> Cube-2048</h1>     -->
 <script src="./libs/jquery.min.js"> </script>
 <script src="./libs/three.js"> </script>
@@ -50,17 +65,61 @@
         <p class="game-explanation">
             <strong class="important">How to play:</strong> Use your <strong>arrow keys</strong> to rotate the cube.<br>
             Use <strong>space bar or mouse click</strong> to view from above. Everything <strong>falls</strong> down!<br>
+            Use <strong>Enter</strong> to recollapse on the same configuration<br><br />
             <strong>Topple</strong> the cubes over one another.<br> When two cubes of the same number touch, they <strong>merge</strong> into one! <br>
             Get to the <strong>2048 cube to win! </strong>
         </p>
         <hr>
-        <p>
-            Created by <b>Kshitij Banerjee</b>, Inspired by <a href="http://gabrielecirulli.github.io/2048/" target="_blank">2048 by Gabriele Cirulli</a>
+ 	<p>
+            Created by <a href="mailto:kshitij_libra%40yahoo.com?subject=give_me_the_app&body=Hi%2C%0A%0AI%20would%20like%20this%20game%20on%20my%20phone.%20Please%20create%20an%20app%20for%20%3Cyour-OS%3E%20mobile.%0A%0ARegards%2C%20%0A%3Cyourname%3E">Kshitij Banerjee</a>, Inspired by <a href="http://gabrielecirulli.github.io/2048/" target="_blank">2048 by Gabriele Cirulli</a>			
         </p>
+	<p>
+		Good karmas are rewarded with free mobile versions :) Dont forget to send me your details!
+	</p>
 
+        <table>
+            <tr>
+                <td>
+                    <a href="http://www.chromeexperiments.com/detail/cubiks-2048/"><img src="imgs/badge.png" alt="See my Experiment on ChromeExperiments.com" /></a>
+                </td>
+                <td>
+                    <form class="pp-donate" action="https://www.paypal.com/cgi-bin/webscr" method="post" target="_top">
+                        <input type="hidden" name="cmd" value="_s-xclick">
+                        <input type="hidden" name="hosted_button_id" value="GQKCW8P7MBKD4">
+                        <button class="donate_button" name="submit"><img src="meta/pp.svg">Donate</button>
+                        <img alt="" border="0" src="https://www.paypalobjects.com/en_GB/i/scr/pixel.gif" width="1" height="1">
+                    </form>
+                </td>
+                <td>
+                <a data-size="large" href="https://twitter.com/share/?text=Check out this amazing 3D version of 2048 @ " class="twitter-share-button" data-lang="en">Tweet</a>
+                </td>
+                <td>
+                	<div class="fb-share-button" data-href="http://kshitij-banerjee.github.io/Cubiks-2048/" data-type="button_count"></div>
+                </td>
+                <td>
+                    <a target="_blank" style="font-size:x-large"href="http://www.reddit.com/r/2048/comments/24hcjl/3d_2048_with_webgl_technology/" > <img src="http://sc.reddit.com/static/spreddit5.gif" alt="submit to reddit" border="0"> Discuss!</a>
+                </td>
+               
+            </tr>
+        </table>
 
-        <a target="_blank" href="http://sc.reddit.com/submit" onclick="window.location = 'http://sc.reddit.com/submit?url=' + encodeURIComponent(window.location); return false"> <img src="http://sc.reddit.com/static/spreddit11.gif" alt="submit to reddit" border="0"> </a>
+        <br />
+        <a rel="license" href="http://creativecommons.org/licenses/by-nc/4.0/"><img alt="Creative Commons License" style="border-width:0" src="http://i.creativecommons.org/l/by-nc/4.0/88x31.png" /></a><br />This work is licensed under a <a rel="license" href="http://creativecommons.org/licenses/by-nc/4.0/">Creative Commons Attribution-NonCommercial 4.0 International License</a>.
+        <script>
+            !function (d, s, id) {
+                var js, fjs = d.getElementsByTagName(s)[0];
+                if (!d.getElementById(id))
+                {
+                    js = d.createElement(s); js.id = id; js.src = "https://platform.twitter.com/widgets.js"; fjs.parentNode.insertBefore(js, fjs);
+                }
+            }(document, "script", "twitter-wjs");
+        </script>
+        <br>
+        <br />
+        <div class="fb-comments" data-href="http://kshitij-banerjee.github.io/Cubiks-2048/" data-width="500" data-numposts="10" data-colorscheme="light"></div>
+
     </div>
+
 
 <script src="./js/main.js"></script>        
 
